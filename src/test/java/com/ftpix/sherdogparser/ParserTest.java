@@ -33,26 +33,28 @@ public class ParserTest {
 
         //Checking on few main events
         assertTrue(ufc.getEvents().stream().anyMatch(e -> e.getName().equalsIgnoreCase("UFC 1 - The Beginning")));
-        assertTrue(ufc.getEvents().stream().anyMatch(e -> e.getShergodUrl().equalsIgnoreCase("http://www.sherdog.com/events/UFC-1-The-Beginning-7")));
+        assertTrue(ufc.getEvents().stream().anyMatch(e -> e.getSherdogUrl().equalsIgnoreCase("http://www.sherdog.com/events/UFC-1-The-Beginning-7")));
 
         assertTrue(ufc.getEvents().stream().anyMatch(e -> e.getName().equalsIgnoreCase("UFC 100 - Lesnar vs. Mir 2")));
-        assertTrue(ufc.getEvents().stream().anyMatch(e -> e.getShergodUrl().equalsIgnoreCase("http://www.sherdog.com/events/UFC-100-Lesnar-vs-Mir-2-9568")));
+        assertTrue(ufc.getEvents().stream().anyMatch(e -> e.getSherdogUrl().equalsIgnoreCase("http://www.sherdog.com/events/UFC-100-Lesnar-vs-Mir-2-9568")));
 
         assertTrue(ufc.getEvents().stream().anyMatch(e -> e.getName().equalsIgnoreCase("UFC 200 - Tate vs. Nunes")));
-        assertTrue(ufc.getEvents().stream().anyMatch(e -> e.getShergodUrl().equalsIgnoreCase("http://www.sherdog.com/events/UFC-200-Tate-vs-Nunes-47285")));
+        assertTrue(ufc.getEvents().stream().anyMatch(e -> e.getSherdogUrl().equalsIgnoreCase("http://www.sherdog.com/events/UFC-200-Tate-vs-Nunes-47285")));
         assertEquals(Organizations.UFC.url, ufc.getSherdogUrl());
 
     }
 
     @Test
     public void testEventParser() throws IOException, ParseException {
-        Event ufc1 = new EventParser(ZoneId.systemDefault()).parse("http://www.sherdog.com/events/UFC-1-The-Beginning-7");
+        Event ufc1 = new EventParser(ZoneId.of("Asia/Kuala_Lumpur")).parse("http://www.sherdog.com/events/UFC-1-The-Beginning-7");
         assertEquals("UFC 1 - The Beginning", ufc1.getName());
         assertEquals("Ultimate Fighting Championship", ufc1.getOrganization().getName());
         assertEquals("http://www.sherdog.com/organizations/Ultimate-Fighting-Championship-2", ufc1.getOrganization().getSherdogUrl());
         assertEquals(8, ufc1.getFights().size());
-        assertEquals("http://www.sherdog.com/events/UFC-1-The-Beginning-7", ufc1.getShergodUrl());
+        assertEquals("http://www.sherdog.com/events/UFC-1-The-Beginning-7", ufc1.getSherdogUrl());
+        assertEquals("1993-11-12T16:00+08:00[Asia/Kuala_Lumpur]", ufc1.getDate().toString());
 
+        System.out.println(ufc1.getDate());
         //Testing main event
         Fight fight = ufc1.getFights().get(0);
         assertEquals(FightResult.FIGHTER_1_WIN, fight.getResult());
@@ -64,8 +66,8 @@ public class ParserTest {
         assertEquals(1, fight.getWinRound());
         assertEquals("1:44", fight.getWinTime());
         assertEquals("UFC 1 - The Beginning", fight.getEvent().getName());
-        assertEquals("http://www.sherdog.com/events/UFC-1-The-Beginning-7", fight.getEvent().getShergodUrl());
-
+        assertEquals("http://www.sherdog.com/events/UFC-1-The-Beginning-7", fight.getEvent().getSherdogUrl());
+        assertEquals("1993-11-12T16:00+08:00[Asia/Kuala_Lumpur]", fight.getDate().toString());
 
         //Testing main event
         fight = ufc1.getFights().get(6);
@@ -78,14 +80,15 @@ public class ParserTest {
         assertEquals(1, fight.getWinRound());
         assertEquals("4:20", fight.getWinTime());
         assertEquals("UFC 1 - The Beginning", fight.getEvent().getName());
-        assertEquals("http://www.sherdog.com/events/UFC-1-The-Beginning-7", fight.getEvent().getShergodUrl());
+        assertEquals("http://www.sherdog.com/events/UFC-1-The-Beginning-7", fight.getEvent().getSherdogUrl());
+        assertEquals("1993-11-12T16:00+08:00[Asia/Kuala_Lumpur]", fight.getDate().toString());
     }
 
     @Test
     public void testFighterParser() throws IOException, ParseException {
         //trying to test on a passed away fighter to make the data won't change
         //RIP Kevin
-        Fighter fighter = new FighterParser(Constants.FIGHTER_PICTURE_CACHE_FOLDER).parse("http://www.sherdog.com/fighter/Kevin-Randleman-162");
+        Fighter fighter = new FighterParser(Constants.FIGHTER_PICTURE_CACHE_FOLDER, ZoneId.of("Asia/Kuala_Lumpur")).parse("http://www.sherdog.com/fighter/Kevin-Randleman-162");
         assertEquals("Kevin Randleman", fighter.getName());
         assertEquals(17, fighter.getWins());
         assertEquals(16, fighter.getLosses());
@@ -103,7 +106,7 @@ public class ParserTest {
 
         assertEquals(17 + 16, fighter.getFights().size());
 
-        Fight fight = fighter.getFights().get(0);
+        Fight fight = fighter.getFights().get(fighter.getFights().size() - 1);
 
         assertEquals(FightResult.FIGHTER_2_WIN, fight.getResult());
         assertEquals("http://www.sherdog.com/fighter/Baga-Agaev-11793", fight.getFighter2().getSherdogUrl());
@@ -112,10 +115,10 @@ public class ParserTest {
         assertEquals(1, fight.getWinRound());
         assertEquals("4:05", fight.getWinTime());
         assertEquals("FEFoMP - Mayor's Cup 2011", fight.getEvent().getName());
-        assertEquals("http://www.sherdog.com/events/FEFoMP-Mayors-Cup-2011-16778", fight.getEvent().getShergodUrl());
-
+        assertEquals("http://www.sherdog.com/events/FEFoMP-Mayors-Cup-2011-16778", fight.getEvent().getSherdogUrl());
+        assertEquals("2011-05-07T12:00+08:00[Asia/Kuala_Lumpur]", fight.getDate().toString());
         //Testing fight with award span
-        fight = fighter.getFights().get(fighter.getFights().size() - 1);
+        fight = fighter.getFights().get(2);
 
         assertEquals(FightResult.FIGHTER_1_WIN, fight.getResult());
         assertEquals("http://www.sherdog.com/fighter/Luis-Carlos-Maciel-24528", fight.getFighter2().getSherdogUrl());
@@ -124,14 +127,15 @@ public class ParserTest {
         assertEquals(1, fight.getWinRound());
         assertEquals("5:14", fight.getWinTime());
         assertEquals("UVF 4 - Universal Vale Tudo Fighting 4", fight.getEvent().getName());
-        assertEquals("http://www.sherdog.com/events/UVF-4-Universal-Vale-Tudo-Fighting-4-394", fight.getEvent().getShergodUrl());
+        assertEquals("http://www.sherdog.com/events/UVF-4-Universal-Vale-Tudo-Fighting-4-394", fight.getEvent().getSherdogUrl());
+        assertEquals("1996-10-22T12:00+08:00[Asia/Kuala_Lumpur]", fight.getDate().toString());
         //assertTrue(fighter.getBirthday() == 0);
     }
 
     @Test
-    public void testBuilder(){
+    public void testBuilder() {
 
-        Sherdog parser =  new Sherdog.Builder().withCacheFolder("cache-test").withTimezone("Asia/Kuala_Lumpur").build();
+        Sherdog parser = new Sherdog.Builder().withCacheFolder("cache-test").withTimezone("Asia/Kuala_Lumpur").build();
 
         assertEquals("cache-test/", parser.getCacheFolder());
         assertEquals("Asia/Kuala_Lumpur", parser.getZoneId().getId());

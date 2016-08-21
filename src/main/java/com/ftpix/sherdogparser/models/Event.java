@@ -6,12 +6,12 @@ import java.util.Date;
 import java.util.List;
 
 
-public class Event {
+public class Event implements SherdogModel{
 
     private Organization organization;
     private String name;
     private ZonedDateTime date;
-    private String shergodUrl;
+    private String sherdogUrl;
     private List<Fight> fights;
     private String location;
 
@@ -39,12 +39,13 @@ public class Event {
         this.date = date;
     }
 
-    public String getShergodUrl() {
-        return shergodUrl;
+    @Override
+    public String getSherdogUrl() {
+        return sherdogUrl;
     }
 
-    public void setShergodUrl(String shergodUrl) {
-        this.shergodUrl = shergodUrl;
+    public void setSherdogUrl(String sherdogUrl) {
+        this.sherdogUrl = sherdogUrl;
     }
 
     public List<Fight> getFights() {
@@ -66,7 +67,7 @@ public class Event {
     public boolean equals(Object arg0) {
         try {
             Event event = (Event) arg0;
-            return event.getShergodUrl().equalsIgnoreCase(shergodUrl);
+            return event.getSherdogUrl().equalsIgnoreCase(sherdogUrl);
         } catch (Exception e) {
             return false;
         }
@@ -78,7 +79,9 @@ public class Event {
         return "Event{" +
                 "name='" + name + '\'' +
                 ", date=" + date +
-                ", shergodUrl='" + shergodUrl + '\'' +
+                ", sherdogUrl='" + sherdogUrl + '\'' +
                 '}';
     }
+
+
 }

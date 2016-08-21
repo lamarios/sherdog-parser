@@ -11,6 +11,7 @@ import org.apache.commons.io.FileUtils;
 import org.jsoup.Jsoup;
 import org.jsoup.nodes.Document;
 import org.jsoup.nodes.Element;
+import org.jsoup.parser.Parser;
 import org.jsoup.select.Elements;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -20,6 +21,8 @@ import java.io.IOException;
 import java.net.URL;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
+import java.time.ZoneId;
+import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -31,7 +34,7 @@ public class FighterParser implements SherdogParser<Fighter> {
     private final SimpleDateFormat df = new SimpleDateFormat("yyyy-dd-MM");
 
     private final String CACHE_FOLDER;
-
+    private final ZoneId ZONE_ID;
     private final int COLUMN_RESULT = 0, COLUMN_OPPONENT = 1, COLUMN_EVENT = 2, COLUMN_METHOD = 3, COLUMN_ROUND = 4, COLUMN_TIME = 5;
 
     /**
@@ -39,6 +42,15 @@ public class FighterParser implements SherdogParser<Fighter> {
      */
     public FighterParser(String cacheFolder) {
         this.CACHE_FOLDER = cacheFolder;
+        ZONE_ID = ZoneId.systemDefault();
+    }
+
+    /**
+     * Generates a fight parser with specified cache folder and zone id
+     */
+    public FighterParser(String cacheFolder, ZoneId zoneId) {
+        this.CACHE_FOLDER = cacheFolder;
+        this.ZONE_ID = zoneId;
     }
 
     /**
@@ -46,6 +58,8 @@ public class FighterParser implements SherdogParser<Fighter> {
      */
     public FighterParser() {
         this.CACHE_FOLDER = Constants.FIGHTER_PICTURE_CACHE_FOLDER;
+        ZONE_ID = ZoneId.systemDefault();
+
     }
 
 
@@ -141,7 +155,7 @@ public class FighterParser implements SherdogParser<Fighter> {
         }
 
         getFights(doc, fighter);
-
+        fighter.getFights().sort((f1, f2) -> f1.getDate().compareTo(f2.getDate()));
 
         logger.info("Found {} fights for {}", fighter.getFights().size(), fighter.getName());
         return fighter;
@@ -149,9 +163,9 @@ public class FighterParser implements SherdogParser<Fighter> {
 
 
     /**
-     *
      * Get a fighter fights
-     * @param doc JSOUP html document
+     *
+     * @param doc     JSOUP html document
      * @param fighter a fighter to parse against
      */
     private void getFights(Document doc, Fighter fighter) {
@@ -186,7 +200,10 @@ public class FighterParser implements SherdogParser<Fighter> {
 
                     Event event = new Event();
                     event.setName(link.html().replaceAll("<span itemprop=\"award\">|<\\/span>", ""));
-                    event.setShergodUrl(link.attr("abs:href"));
+                    event.setSherdogUrl(link.attr("abs:href"));
+                    //date
+                    Element date = td.select("span.sub_line").first();
+                   fight.setDate(ParserUtils.getDateFromStringToZoneId(date.html(), ZONE_ID, DateTimeFormatter.ofPattern("MMM / dd / yyyy")));
                     fight.setEvent(event);
                     break;
                 case COLUMN_METHOD:

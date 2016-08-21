@@ -5,7 +5,7 @@ import java.util.Date;
 import java.util.List;
 
 
-public class Fighter {
+public class Fighter implements  SherdogModel {
 
     private String name = "";
     private String nickname = "";
@@ -28,6 +28,7 @@ public class Fighter {
         this.name = name;
     }
 
+    @Override
     public String getSherdogUrl() {
         return sherdogUrl;
     }

@@ -1,12 +1,13 @@
 package com.ftpix.sherdogparser.models;
 
+import java.time.ZonedDateTime;
 import java.util.Date;
 
 public class Fight {
     private Event event;
     private Fighter fighter1;
     private Fighter fighter2;
-    private Date date;
+    private ZonedDateTime date;
     private FightResult result = FightResult.NOT_HAPPENED;
     private String winMethod, winTime;
     private int winRound;
@@ -35,11 +36,11 @@ public class Fight {
         this.fighter2 = fighter2;
     }
 
-    public Date getDate() {
+    public ZonedDateTime getDate() {
         return date;
     }
 
-    public void setDate(Date date) {
+    public void setDate(ZonedDateTime date) {
         this.date = date;
     }
 
@@ -81,7 +82,7 @@ public class Fight {
             Fight fight = (Fight) obj;
 
             boolean equals = fight.getFighter1().getSherdogUrl().equalsIgnoreCase(fighter1.getSherdogUrl())
-                    && fight.getFighter2().getSherdogUrl().equalsIgnoreCase(fighter2.getSherdogUrl()) && event.getShergodUrl().equals(fight.getEvent().getShergodUrl());
+                    && fight.getFighter2().getSherdogUrl().equalsIgnoreCase(fighter2.getSherdogUrl()) && event.getSherdogUrl().equals(fight.getEvent().getSherdogUrl());
 
             return equals;
         } catch (Exception e) {

@@ -17,6 +17,7 @@ import org.slf4j.LoggerFactory;
 import java.io.IOException;
 import java.text.ParseException;
 import java.time.ZoneId;
+import java.time.format.DateTimeParseException;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -54,7 +55,7 @@ public class EventParser implements SherdogParser<Event> {
     @Override
     public Event parse(String url) throws IOException, ParseException {
         Event event = new Event();
-        event.setShergodUrl(url);
+        event.setSherdogUrl(url);
 
         Document doc = Jsoup.connect(url).timeout(Constants.PARSING_TIMEOUT).get();
 
@@ -64,7 +65,13 @@ public class EventParser implements SherdogParser<Event> {
 
         Elements date = doc.select(".authors_info .date meta[itemprop=\"startDate\"]");
         //TODO: get date to proper format
-        date.first().attr("content");
+        try {
+            event.setDate(ParserUtils.getDateFromStringToZoneId(date.first().attr("content"), ZONE_ID));
+        }catch(DateTimeParseException e){
+            logger.error("Couldn't parse date", e);
+        }
+
+
 
         getFights(doc, event);
 
@@ -84,7 +91,7 @@ public class EventParser implements SherdogParser<Event> {
      * @param event The current event
      */
     private void getFights(Document doc, Event event) {
-        logger.info("Getting fights for event #{}[{}]", event.getShergodUrl(), event.getName());
+        logger.info("Getting fights for event #{}[{}]", event.getSherdogUrl(), event.getName());
 
         List<Fight> fights = new ArrayList<Fight>();
 
@@ -117,7 +124,7 @@ public class EventParser implements SherdogParser<Event> {
         mainFight.setWinMethod(mainTd.get(1).html().replaceAll("<em(.*)<br>", "").trim());
         mainFight.setWinRound(Integer.parseInt(mainTd.get(3).html().replaceAll("<em(.*)<br>", "").trim()));
         mainFight.setWinTime(mainTd.get(4).html().replaceAll("<em(.*)<br>", "").trim());
-
+        mainFight.setDate(event.getDate());
         fights.add(mainFight);
         logger.info("Fight added: {}", mainFight);
         //Checking on card results
@@ -170,7 +177,7 @@ public class EventParser implements SherdogParser<Event> {
                     fight.setWinTime(td.html());
 
                     fight.setEvent(event);
-                    //fight.setDate(event.getDate());
+                    fight.setDate(event.getDate());
                     fights.add(fight);
                     logger.info("Fight added: {}", fight);
 

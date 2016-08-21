@@ -18,6 +18,8 @@ import java.time.Instant;
 import java.time.OffsetDateTime;
 import java.time.ZoneId;
 import java.time.ZonedDateTime;
+import java.time.format.DateTimeFormatter;
+import java.time.format.DateTimeParseException;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
@@ -30,7 +32,7 @@ public class OrganizationParser implements SherdogParser<Organization> {
     private final Logger logger = LoggerFactory.getLogger(OrganizationParser.class);
 
     private final int DATE_COLUMN = 1, NAME_COLUMN = 2, LOCATION_COLUMN = 3;
-    private final SimpleDateFormat df = new SimpleDateFormat("yyyy-MM-dd'T'HHmmssZ");
+    private final DateTimeFormatter df = DateTimeFormatter.ofPattern("yyyy-MM-dd' 'HH:mm:ss");
     //private final SimpleDateFormat df2 = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
 
     private final ZoneId ZONE_ID;
@@ -94,12 +96,14 @@ public class OrganizationParser implements SherdogParser<Organization> {
         } while (toAdd.size() > 0);
 
 
+        organization.getEvents().sort((o1, o2) -> o1.getDate().compareTo(o2.getDate()));
         return organization;
     }
 
 
     /**
      * Get all the events of an organization
+     *
      * @param td the JSOUP TD elements from the event table
      * @return a list of events
      * @throws ParseException if something is wrong with sherdog layout
@@ -112,6 +116,7 @@ public class OrganizationParser implements SherdogParser<Organization> {
         td.remove(0);
         td.remove(0);
         Event event = new Event();
+        boolean addEvent = true;
         for (Element element : td) {
             switch (i) {
                 case DATE_COLUMN:
@@ -125,6 +130,12 @@ public class OrganizationParser implements SherdogParser<Organization> {
                     // ZonedDateTime usDate = ZonedDateTime.ofInstant(eventDate.toInstant(), );
                     //System.out.println(usDate);
                     // event.setDate(usDate);
+                    try {
+                        event.setDate(ParserUtils.getDateFromStringToZoneId(date, ZONE_ID));
+                    } catch (DateTimeParseException e) {
+                        logger.error("Couldn't fornat date, we shouldn't add the event", e);
+                        addEvent = false;
+                    }
                     break;
                 case NAME_COLUMN:
                     Elements name = element.select("span[itemprop=\"name\"");
@@ -134,7 +145,7 @@ public class OrganizationParser implements SherdogParser<Organization> {
                     event.setName(event.getName().replaceAll("( )+", " "));
                     event.setName(event.getName().trim());
                     Elements url = element.select("a[itemprop=\"url\"");
-                    event.setShergodUrl(url.get(0).attr("abs:href"));
+                    event.setSherdogUrl(url.get(0).attr("abs:href"));
                     break;
                 case LOCATION_COLUMN:
                     String[] split = element.html().split(">");
@@ -153,9 +164,10 @@ public class OrganizationParser implements SherdogParser<Organization> {
                 // logger.info("Event date: Sherdog:{}, local:{}",
                 // event.getDate(), local);
 
-                logger.info("Adding event {}", event.getName());
-                events.add(event);
-
+                if (addEvent) {
+                    logger.info("Adding event {}", event.getName());
+                    events.add(event);
+                }
                 event = new Event();
                 i = 1;
             }

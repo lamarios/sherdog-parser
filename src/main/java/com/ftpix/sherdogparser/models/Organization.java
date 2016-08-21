@@ -4,7 +4,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 
-public class Organization {
+public class Organization implements SherdogModel {
 
     private int id;
     private String name;
@@ -28,7 +28,7 @@ public class Organization {
         this.name = name;
     }
 
-
+    @Override
     public String getSherdogUrl() {
         return sherdogUrl;
     }
