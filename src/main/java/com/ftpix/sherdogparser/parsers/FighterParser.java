@@ -1,10 +1,9 @@
 package com.ftpix.sherdogparser.parsers;
 
 import com.ftpix.sherdogparser.Constants;
-import com.ftpix.sherdogparser.models.Event;
 import com.ftpix.sherdogparser.models.Fight;
-import com.ftpix.sherdogparser.models.FightResult;
 import com.ftpix.sherdogparser.models.Fighter;
+import com.ftpix.sherdogparser.models.SherdogBaseObject;
 
 import org.apache.commons.codec.digest.DigestUtils;
 import org.apache.commons.io.FileUtils;
@@ -152,6 +151,7 @@ public class FighterParser implements SherdogParser<Fighter> {
             String newPath = CACHE_FOLDER + hash(fighter.getSherdogUrl()) + ".JPG";
             File f = new File(newPath);
             FileUtils.copyURLToFile(new URL(pictureUrl), f);
+            fighter.setPicture(newPath);
         }
 
         getFights(doc, fighter);
@@ -180,7 +180,10 @@ public class FighterParser implements SherdogParser<Fighter> {
         tds.remove(0);
 
         Fight fight = new Fight();
-        fight.setFighter1(fighter);
+        SherdogBaseObject sFighter = new SherdogBaseObject();
+        sFighter.setName(fighter.getName());
+        sFighter.setSherdogUrl(fighter.getSherdogUrl());
+        fight.setFighter1(sFighter);
 
         for (int i = 0; i < tds.size(); i++) {
             Element td = tds.get(i);
@@ -189,7 +192,7 @@ public class FighterParser implements SherdogParser<Fighter> {
                     fight.setResult(ParserUtils.getFightResult(td));
                     break;
                 case COLUMN_OPPONENT:
-                    Fighter opponent = new Fighter();
+                    SherdogBaseObject opponent = new SherdogBaseObject();
                     Element opponentLink = td.select("a").get(0);
                     opponent.setName(opponentLink.html());
                     opponent.setSherdogUrl(opponentLink.attr("abs:href"));
@@ -198,7 +201,7 @@ public class FighterParser implements SherdogParser<Fighter> {
                 case COLUMN_EVENT:
                     Element link = td.select("a").get(0);
 
-                    Event event = new Event();
+                    SherdogBaseObject event = new SherdogBaseObject();
                     event.setName(link.html().replaceAll("<span itemprop=\"award\">|<\\/span>", ""));
                     event.setSherdogUrl(link.attr("abs:href"));
                     //date
@@ -218,7 +221,7 @@ public class FighterParser implements SherdogParser<Fighter> {
                     fighter.getFights().add(fight);
                     logger.info("{}", fight);
                     fight = new Fight();
-                    fight.setFighter1(fighter);
+                    fight.setFighter1(sFighter);
                     break;
             }
         }

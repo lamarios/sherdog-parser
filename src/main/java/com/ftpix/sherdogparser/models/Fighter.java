@@ -5,9 +5,8 @@ import java.util.Date;
 import java.util.List;
 
 
-public class Fighter implements  SherdogModel {
+public class Fighter extends SherdogBaseObject {
 
-    private String name = "";
     private String nickname = "";
     private String height = "";
     private String weight = "";
@@ -17,25 +16,9 @@ public class Fighter implements  SherdogModel {
     private int draws = 0;
     private int nc = 0;
     private String picture = "";
-    private String sherdogUrl;
     private List<Fight> fights = new ArrayList<>();
 
-    public String getName() {
-        return name;
-    }
 
-    public void setName(String name) {
-        this.name = name;
-    }
-
-    @Override
-    public String getSherdogUrl() {
-        return sherdogUrl;
-    }
-
-    public void setSherdogUrl(String sherdogUrl) {
-        this.sherdogUrl = sherdogUrl;
-    }
 
     public String getNickname() {
         return nickname;

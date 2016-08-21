@@ -4,35 +4,35 @@ import java.time.ZonedDateTime;
 import java.util.Date;
 
 public class Fight {
-    private Event event;
-    private Fighter fighter1;
-    private Fighter fighter2;
+    private SherdogBaseObject event;
+    private SherdogBaseObject fighter1;
+    private SherdogBaseObject fighter2;
     private ZonedDateTime date;
     private FightResult result = FightResult.NOT_HAPPENED;
     private String winMethod, winTime;
     private int winRound;
 
-    public Event getEvent() {
+    public SherdogBaseObject getEvent() {
         return event;
     }
 
-    public void setEvent(Event event) {
+    public void setEvent(SherdogBaseObject event) {
         this.event = event;
     }
 
-    public Fighter getFighter1() {
+    public SherdogBaseObject getFighter1() {
         return fighter1;
     }
 
-    public void setFighter1(Fighter fighter1) {
+    public void setFighter1(SherdogBaseObject fighter1) {
         this.fighter1 = fighter1;
     }
 
-    public Fighter getFighter2() {
+    public SherdogBaseObject getFighter2() {
         return fighter2;
     }
 
-    public void setFighter2(Fighter fighter2) {
+    public void setFighter2(SherdogBaseObject fighter2) {
         this.fighter2 = fighter2;
     }
 

@@ -1,5 +1,7 @@
 package com.ftpix.sherdogparser;
 
+import com.google.gson.Gson;
+
 import com.ftpix.sherdogparser.models.Event;
 import com.ftpix.sherdogparser.models.Fight;
 import com.ftpix.sherdogparser.models.FightResult;
@@ -14,8 +16,11 @@ import org.junit.Test;
 
 import java.io.File;
 import java.io.IOException;
+import java.lang.reflect.Modifier;
 import java.text.ParseException;
 import java.time.ZoneId;
+
+import io.gsonfire.GsonFireBuilder;
 
 import static org.junit.Assert.*;
 
@@ -27,6 +32,8 @@ public class ParserTest {
     @Test
     public void testOrganizationParser() throws IOException, ParseException {
         Organization ufc = new OrganizationParser().parse(Organizations.UFC.url);
+
+
 
         //ufc.getEvents().forEach(System.out::println);
         assertEquals("Ultimate Fighting Championship", ufc.getName());
@@ -42,11 +49,25 @@ public class ParserTest {
         assertTrue(ufc.getEvents().stream().anyMatch(e -> e.getSherdogUrl().equalsIgnoreCase("http://www.sherdog.com/events/UFC-200-Tate-vs-Nunes-47285")));
         assertEquals(Organizations.UFC.url, ufc.getSherdogUrl());
 
+        //Testing gson in case of stackoverflow.
+        Gson gson = new GsonFireBuilder().enableExposeMethodResult().createGsonBuilder().excludeFieldsWithModifiers(Modifier.STATIC, Modifier.TRANSIENT, Modifier.VOLATILE).serializeSpecialFloatingPointValues().create();
+        gson.toJson(ufc);
+
+
     }
 
     @Test
     public void testEventParser() throws IOException, ParseException {
+//
+        // Event test = new EventParser(ZoneId.of("Asia/Kuala_Lumpur")).parse("http://www.sherdog.com/events/UFC-Mexico-City-51653");
+        //System.out.println(test);
+        //test.getFights().forEach(System.out::println);
+
+
+        //System.out.println(gson.toJson(test));
+
         Event ufc1 = new EventParser(ZoneId.of("Asia/Kuala_Lumpur")).parse("http://www.sherdog.com/events/UFC-1-The-Beginning-7");
+
         assertEquals("UFC 1 - The Beginning", ufc1.getName());
         assertEquals("Ultimate Fighting Championship", ufc1.getOrganization().getName());
         assertEquals("http://www.sherdog.com/organizations/Ultimate-Fighting-Championship-2", ufc1.getOrganization().getSherdogUrl());
@@ -54,7 +75,6 @@ public class ParserTest {
         assertEquals("http://www.sherdog.com/events/UFC-1-The-Beginning-7", ufc1.getSherdogUrl());
         assertEquals("1993-11-12T16:00+08:00[Asia/Kuala_Lumpur]", ufc1.getDate().toString());
 
-        System.out.println(ufc1.getDate());
         //Testing main event
         Fight fight = ufc1.getFights().get(0);
         assertEquals(FightResult.FIGHTER_1_WIN, fight.getResult());
@@ -82,6 +102,11 @@ public class ParserTest {
         assertEquals("UFC 1 - The Beginning", fight.getEvent().getName());
         assertEquals("http://www.sherdog.com/events/UFC-1-The-Beginning-7", fight.getEvent().getSherdogUrl());
         assertEquals("1993-11-12T16:00+08:00[Asia/Kuala_Lumpur]", fight.getDate().toString());
+
+        //Testing gson in case of stackoverflow.
+        Gson gson = new GsonFireBuilder().enableExposeMethodResult().createGsonBuilder().excludeFieldsWithModifiers(Modifier.STATIC, Modifier.TRANSIENT, Modifier.VOLATILE).serializeSpecialFloatingPointValues().create();
+        gson.toJson(ufc1);
+
     }
 
     @Test
@@ -89,6 +114,10 @@ public class ParserTest {
         //trying to test on a passed away fighter to make the data won't change
         //RIP Kevin
         Fighter fighter = new FighterParser(Constants.FIGHTER_PICTURE_CACHE_FOLDER, ZoneId.of("Asia/Kuala_Lumpur")).parse("http://www.sherdog.com/fighter/Kevin-Randleman-162");
+
+
+
+
         assertEquals("Kevin Randleman", fighter.getName());
         assertEquals(17, fighter.getWins());
         assertEquals(16, fighter.getLosses());
@@ -105,6 +134,11 @@ public class ParserTest {
         }
 
         assertEquals(17 + 16, fighter.getFights().size());
+
+        //Testing gson in case of stackoverflow.
+        Gson gson = new GsonFireBuilder().enableExposeMethodResult().createGsonBuilder().excludeFieldsWithModifiers(Modifier.STATIC, Modifier.TRANSIENT, Modifier.VOLATILE).serializeSpecialFloatingPointValues().create();
+        gson.toJson(fighter);
+
 
         Fight fight = fighter.getFights().get(fighter.getFights().size() - 1);
 

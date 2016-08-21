@@ -4,38 +4,9 @@ import java.util.ArrayList;
 import java.util.List;
 
 
-public class Organization implements SherdogModel {
-
-    private int id;
-    private String name;
-    private String sherdogUrl;
+public class Organization extends SherdogBaseObject {
 
     public List<Event> events = new ArrayList<Event>();
-
-    public int getId() {
-        return id;
-    }
-
-    public void setId(int id) {
-        this.id = id;
-    }
-
-    public String getName() {
-        return name;
-    }
-
-    public void setName(String name) {
-        this.name = name;
-    }
-
-    @Override
-    public String getSherdogUrl() {
-        return sherdogUrl;
-    }
-
-    public void setSherdogUrl(String sherdogUrl) {
-        this.sherdogUrl = sherdogUrl;
-    }
 
     public List<Event> getEvents() {
         return events;

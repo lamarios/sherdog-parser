@@ -1,35 +1,28 @@
 package com.ftpix.sherdogparser.models;
 
+import java.nio.channels.Pipe;
 import java.time.ZonedDateTime;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 
 
-public class Event implements SherdogModel{
+public class Event extends  SherdogBaseObject{
 
-    private Organization organization;
-    private String name;
+    private SherdogBaseObject organization;
     private ZonedDateTime date;
-    private String sherdogUrl;
-    private List<Fight> fights;
-    private String location;
+    private List<Fight> fights = new ArrayList<>();
+    private String location = "";
 
-    public Organization getOrganization() {
+    public SherdogBaseObject getOrganization() {
         return organization;
     }
 
-    public void setOrganization(Organization organization) {
+    public void setOrganization(SherdogBaseObject organization) {
         this.organization = organization;
     }
 
-    public String getName() {
-        return name;
-    }
 
-    public void setName(String name) {
-        this.name = name;
-    }
 
     public ZonedDateTime getDate() {
         return date;
@@ -39,14 +32,6 @@ public class Event implements SherdogModel{
         this.date = date;
     }
 
-    @Override
-    public String getSherdogUrl() {
-        return sherdogUrl;
-    }
-
-    public void setSherdogUrl(String sherdogUrl) {
-        this.sherdogUrl = sherdogUrl;
-    }
 
     public List<Fight> getFights() {
         return fights;
@@ -76,12 +61,15 @@ public class Event implements SherdogModel{
 
     @Override
     public String toString() {
+        System.out.println("Org:"+organization);
+        System.out.println("Date:"+date);
+        System.out.println("Fights:" + fights);
+        System.out.println("Location:"+location);
         return "Event{" +
-                "name='" + name + '\'' +
+                "organization=" + organization +
                 ", date=" + date +
-                ", sherdogUrl='" + sherdogUrl + '\'' +
+                ", fights=" + fights +
+                ", location='" + location + '\'' +
                 '}';
     }
-
-
 }
