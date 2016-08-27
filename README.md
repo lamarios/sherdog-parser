@@ -9,6 +9,8 @@ Sherdog Parser is Java library to parse through Sherdog and have get all the inf
 ## Usage
 [Java Documentation](https://lamarios.github.io/sherdog-parser/apidocs/)
 
+
+
 First created a Sherdog object with your own timezone and a cache folder where the fighter pictures will be downloaded
 ```Java
 Sherdog parser = new Sherdog.Builder().withCacheFolder("/mnt/media/fighter-pictures/cache").withTimezone("Asia/Kuala_Lumpur").build();
