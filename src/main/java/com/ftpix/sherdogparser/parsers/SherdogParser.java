@@ -12,6 +12,7 @@ public interface SherdogParser<T> {
      * Parse a sherdog page
      *
      * @param url of the sherdog page
+     * @return the object parsed by the parser
      * @throws IOException    if connecting to sherdog fails
      * @throws ParseException if the page structure has changed
      */

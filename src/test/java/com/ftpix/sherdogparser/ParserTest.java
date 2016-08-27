@@ -114,6 +114,7 @@ public class ParserTest {
         //trying to test on a passed away fighter to make the data won't change
         //RIP Kevin
         Fighter fighter = new FighterParser(Constants.FIGHTER_PICTURE_CACHE_FOLDER, ZoneId.of("Asia/Kuala_Lumpur")).parse("http://www.sherdog.com/fighter/Kevin-Randleman-162");
+       // Fighter condit = new FighterParser(Constants.FIGHTER_PICTURE_CACHE_FOLDER, ZoneId.of("Asia/Kuala_Lumpur")).parse("http://www.sherdog.com/fighter/Bec-Rawlings-84964");
 
 
 
@@ -142,6 +143,8 @@ public class ParserTest {
 
         Fight fight = fighter.getFights().get(fighter.getFights().size() - 1);
 
+        //fighter.getFights().forEach(System.out::println);
+
         assertEquals(FightResult.FIGHTER_2_WIN, fight.getResult());
         assertEquals("http://www.sherdog.com/fighter/Baga-Agaev-11793", fight.getFighter2().getSherdogUrl());
         assertEquals("Baga Agaev", fight.getFighter2().getName());
@@ -155,11 +158,11 @@ public class ParserTest {
         fight = fighter.getFights().get(2);
 
         assertEquals(FightResult.FIGHTER_1_WIN, fight.getResult());
-        assertEquals("http://www.sherdog.com/fighter/Luis-Carlos-Maciel-24528", fight.getFighter2().getSherdogUrl());
-        assertEquals("Luis Carlos Maciel", fight.getFighter2().getName());
+        assertEquals("http://www.sherdog.com/fighter/Dan-Bobish-174", fight.getFighter2().getSherdogUrl());
+        assertEquals("Dan Bobish", fight.getFighter2().getName());
         assertEquals("Submission (Punches)", fight.getWinMethod());
         assertEquals(1, fight.getWinRound());
-        assertEquals("5:14", fight.getWinTime());
+        assertEquals("5:50", fight.getWinTime());
         assertEquals("UVF 4 - Universal Vale Tudo Fighting 4", fight.getEvent().getName());
         assertEquals("http://www.sherdog.com/events/UVF-4-Universal-Vale-Tudo-Fighting-4-394", fight.getEvent().getSherdogUrl());
         assertEquals("1996-10-22T12:00+08:00[Asia/Kuala_Lumpur]", fight.getDate().toString());
@@ -167,9 +170,17 @@ public class ParserTest {
     }
 
     @Test
-    public void testBuilder() {
+    public void testBuilder() throws IOException {
 
         Sherdog parser = new Sherdog.Builder().withCacheFolder("cache-test").withTimezone("Asia/Kuala_Lumpur").build();
+
+//        Organization ufc = parser.getOrganization(Organizations.UFC.url);
+//
+//        Event ufc1 = parser.getEvent(ufc.getEvents().get(0).getSherdogUrl());
+//
+//        Fight firstFight = ufc1.getFights().get(0);
+//
+//        Fighter fighter = parser.getFighter(firstFight.getFighter1().getSherdogUrl());
 
         assertEquals("cache-test/", parser.getCacheFolder());
         assertEquals("Asia/Kuala_Lumpur", parser.getZoneId().getId());

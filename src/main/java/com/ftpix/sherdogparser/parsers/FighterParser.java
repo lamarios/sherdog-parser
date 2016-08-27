@@ -23,7 +23,9 @@ import java.text.SimpleDateFormat;
 import java.time.ZoneId;
 import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
+import java.util.Optional;
 
 /**
  * Created by gz on 20-Aug-16.
@@ -154,9 +156,18 @@ public class FighterParser implements SherdogParser<Fighter> {
             fighter.setPicture(newPath);
         }
 
-        getFights(doc, fighter);
-        fighter.getFights().sort((f1, f2) -> f1.getDate().compareTo(f2.getDate()));
+        Elements fightTables = doc.select(".fight_history ");
+        logger.info("Found {} fight history tables", fightTables.size());
 
+        fightTables.stream()
+                .filter(div -> div.select(".module_header h2").html().trim().equalsIgnoreCase("FIGHT HISTORY - PRO"))
+                .map(div -> div.select(".table table td"))
+                .filter(tdList -> tdList.size() > 0)
+                .findFirst()
+                .ifPresent((tdList -> fighter.setFights(getFights(tdList, fighter))));
+
+        //fighter.getFights().sort((f1, f2) -> f1.getDate().compareTo(f2.getDate()));
+        Collections.reverse(fighter.getFights());
         logger.info("Found {} fights for {}", fighter.getFights().size(), fighter.getName());
         return fighter;
     }
@@ -165,12 +176,13 @@ public class FighterParser implements SherdogParser<Fighter> {
     /**
      * Get a fighter fights
      *
-     * @param doc     JSOUP html document
+     * @param tds     JSOUP TDs document
      * @param fighter a fighter to parse against
      */
-    private void getFights(Document doc, Fighter fighter) {
+    private List<Fight> getFights(Elements tds, Fighter fighter) throws ArrayIndexOutOfBoundsException {
+        List<Fight> fights = new ArrayList<>();
 
-        Elements tds = doc.select(".fight_history .table table td");
+        logger.info("{} TDs to parse through", tds.size());
         // removing header row...
         tds.remove(0);
         tds.remove(0);
@@ -206,7 +218,7 @@ public class FighterParser implements SherdogParser<Fighter> {
                     event.setSherdogUrl(link.attr("abs:href"));
                     //date
                     Element date = td.select("span.sub_line").first();
-                   fight.setDate(ParserUtils.getDateFromStringToZoneId(date.html(), ZONE_ID, DateTimeFormatter.ofPattern("MMM / dd / yyyy")));
+                    fight.setDate(ParserUtils.getDateFromStringToZoneId(date.html(), ZONE_ID, DateTimeFormatter.ofPattern("MMM / dd / yyyy")));
                     fight.setEvent(event);
                     break;
                 case COLUMN_METHOD:
@@ -218,17 +230,22 @@ public class FighterParser implements SherdogParser<Fighter> {
                 case COLUMN_TIME:
                     fight.setWinTime(td.html());
                     //last column adding fight and resetting it;
-                    fighter.getFights().add(fight);
+                    fights.add(fight);
                     logger.info("{}", fight);
                     fight = new Fight();
                     fight.setFighter1(sFighter);
                     break;
             }
         }
+
+        return fights;
     }
 
     /**
      * Hashes a string
+     *
+     * @param s the string to hash
+     * @return the hashed string
      */
     public static String hash(String s) {
         return DigestUtils.sha256Hex(s);

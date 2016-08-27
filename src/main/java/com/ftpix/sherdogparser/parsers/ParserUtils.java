@@ -42,6 +42,7 @@ public class ParserUtils {
      *
      * @param date   Date to format
      * @param zoneId Zone id to convert from sherdog's time
+     * @return the  converted zonedatetime
      */
     public static ZonedDateTime getDateFromStringToZoneId(String date, ZoneId zoneId) throws DateTimeParseException {
         ZonedDateTime usDate = ZonedDateTime.parse(date).withZoneSameInstant(ZoneId.of(Constants.SHERDOG_TIME_ZONE));
@@ -55,12 +56,13 @@ public class ParserUtils {
      * @param date      Date to format
      * @param zoneId    Zone id to convert from sherdog's time
      * @param formatter Formatter for exotic date format
+     * @return the converted zonedatetime
      */
     public static ZonedDateTime getDateFromStringToZoneId(String date, ZoneId zoneId, DateTimeFormatter formatter) throws DateTimeParseException {
         try {
             ZonedDateTime usDate = ZonedDateTime.parse(date, formatter).withZoneSameInstant(ZoneId.of(Constants.SHERDOG_TIME_ZONE));
             return usDate.withZoneSameInstant(zoneId);
-        }catch(Exception e){
+        } catch (Exception e) {
             //In case the parsing fail, we try without time
             ZonedDateTime usDate = LocalDate.parse(date, formatter).atStartOfDay(ZoneId.of(Constants.SHERDOG_TIME_ZONE));
             return usDate.withZoneSameInstant(zoneId);
