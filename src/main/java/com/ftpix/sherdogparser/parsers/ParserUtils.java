@@ -13,8 +13,9 @@ import java.time.format.DateTimeParseException;
 
 /**
  * Created by gz on 20-Aug-16.
+ * tools to help during parsing
  */
-public class ParserUtils {
+class ParserUtils {
     /**
      * Gets the result of a fight following sherdog website win/lose/draw/nc
      * Make sure to use on Fighter1 only
@@ -22,7 +23,7 @@ public class ParserUtils {
      * @param element Jsoup element
      * @return a FightResult
      */
-    public static FightResult getFightResult(Element element) {
+    static FightResult getFightResult(Element element) {
         if (element.select(".win").size() > 0) {
             return FightResult.FIGHTER_1_WIN;
         } else if (element.select(".loss").size() > 0) {
@@ -44,7 +45,7 @@ public class ParserUtils {
      * @param zoneId Zone id to convert from sherdog's time
      * @return the  converted zonedatetime
      */
-    public static ZonedDateTime getDateFromStringToZoneId(String date, ZoneId zoneId) throws DateTimeParseException {
+    static ZonedDateTime getDateFromStringToZoneId(String date, ZoneId zoneId) throws DateTimeParseException {
         ZonedDateTime usDate = ZonedDateTime.parse(date).withZoneSameInstant(ZoneId.of(Constants.SHERDOG_TIME_ZONE));
         return usDate.withZoneSameInstant(zoneId);
     }
@@ -58,7 +59,7 @@ public class ParserUtils {
      * @param formatter Formatter for exotic date format
      * @return the converted zonedatetime
      */
-    public static ZonedDateTime getDateFromStringToZoneId(String date, ZoneId zoneId, DateTimeFormatter formatter) throws DateTimeParseException {
+    static ZonedDateTime getDateFromStringToZoneId(String date, ZoneId zoneId, DateTimeFormatter formatter) throws DateTimeParseException {
         try {
             ZonedDateTime usDate = ZonedDateTime.parse(date, formatter).withZoneSameInstant(ZoneId.of(Constants.SHERDOG_TIME_ZONE));
             return usDate.withZoneSameInstant(zoneId);

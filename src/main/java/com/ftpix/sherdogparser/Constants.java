@@ -5,6 +5,7 @@ import java.io.File;
 
 /**
  * Created by gz on 20-Aug-16.
+ * Default values forthe parsers
  */
 public class Constants {
     public final static String SHERDOG_TIME_ZONE = "America/New_York";

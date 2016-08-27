@@ -8,50 +8,68 @@ import com.ftpix.sherdogparser.models.FightResult;
 import com.ftpix.sherdogparser.models.Fighter;
 import com.ftpix.sherdogparser.models.Organization;
 import com.ftpix.sherdogparser.models.Organizations;
-import com.ftpix.sherdogparser.parsers.EventParser;
-import com.ftpix.sherdogparser.parsers.FighterParser;
-import com.ftpix.sherdogparser.parsers.OrganizationParser;
 
+import org.junit.BeforeClass;
 import org.junit.Test;
 
 import java.io.File;
 import java.io.IOException;
 import java.lang.reflect.Modifier;
 import java.text.ParseException;
-import java.time.ZoneId;
 
 import io.gsonfire.GsonFireBuilder;
 
-import static org.junit.Assert.*;
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertTrue;
 
 /**
  * Created by gz on 20-Aug-16.
  */
 public class ParserTest {
 
+    private static Sherdog sherdog;
+
+    @BeforeClass
+    public static void setup(){
+        sherdog = new Sherdog.Builder().withCacheFolder("cache-test").withTimezone("Asia/Kuala_Lumpur").build();
+
+    }
+
+
+    @Test
+    public void testBuilder() throws IOException {
+
+        assertEquals("cache-test/", sherdog.getCacheFolder());
+        assertEquals("Asia/Kuala_Lumpur", sherdog.getZoneId().getId());
+
+        File f = new File(sherdog.getCacheFolder());
+        assertTrue(f.exists());
+    }
+
     @Test
     public void testOrganizationParser() throws IOException, ParseException {
-        Organization ufc = new OrganizationParser().parse(Organizations.UFC.url);
+        Organization ufc = sherdog.getOrganization(Organizations.UFC);
 
 
 
         //ufc.getEvents().forEach(System.out::println);
         assertEquals("Ultimate Fighting Championship", ufc.getName());
-
-        //Checking on few main events
-        assertTrue(ufc.getEvents().stream().anyMatch(e -> e.getName().equalsIgnoreCase("UFC 1 - The Beginning")));
-        assertTrue(ufc.getEvents().stream().anyMatch(e -> e.getSherdogUrl().equalsIgnoreCase("http://www.sherdog.com/events/UFC-1-The-Beginning-7")));
-
-        assertTrue(ufc.getEvents().stream().anyMatch(e -> e.getName().equalsIgnoreCase("UFC 100 - Lesnar vs. Mir 2")));
-        assertTrue(ufc.getEvents().stream().anyMatch(e -> e.getSherdogUrl().equalsIgnoreCase("http://www.sherdog.com/events/UFC-100-Lesnar-vs-Mir-2-9568")));
-
-        assertTrue(ufc.getEvents().stream().anyMatch(e -> e.getName().equalsIgnoreCase("UFC 200 - Tate vs. Nunes")));
-        assertTrue(ufc.getEvents().stream().anyMatch(e -> e.getSherdogUrl().equalsIgnoreCase("http://www.sherdog.com/events/UFC-200-Tate-vs-Nunes-47285")));
         assertEquals(Organizations.UFC.url, ufc.getSherdogUrl());
+
+
+        Event ufc1 = ufc.getEvents().get(0);
+        assertEquals("UFC 1 - The Beginning", ufc1.getName());
+        assertEquals("http://www.sherdog.com/events/UFC-1-The-Beginning-7", ufc1.getSherdogUrl());
+        assertEquals(ufc.getName(), ufc1.getOrganization().getName());
+        assertEquals(ufc.getSherdogUrl(), ufc1.getOrganization().getSherdogUrl());
+        assertEquals("1993-11-12T16:00+08:00[Asia/Kuala_Lumpur]", ufc1.getDate().toString());
+        assertEquals("McNichols Arena, Denver, Colorado, United States", ufc1.getLocation());
 
         //Testing gson in case of stackoverflow.
         Gson gson = new GsonFireBuilder().enableExposeMethodResult().createGsonBuilder().excludeFieldsWithModifiers(Modifier.STATIC, Modifier.TRANSIENT, Modifier.VOLATILE).serializeSpecialFloatingPointValues().create();
         gson.toJson(ufc);
+
+         //ufc.getEvents().forEach(System.out::println);
 
 
     }
@@ -66,7 +84,7 @@ public class ParserTest {
 
         //System.out.println(gson.toJson(test));
 
-        Event ufc1 = new EventParser(ZoneId.of("Asia/Kuala_Lumpur")).parse("http://www.sherdog.com/events/UFC-1-The-Beginning-7");
+        Event ufc1 = sherdog.getEvent("http://www.sherdog.com/events/UFC-1-The-Beginning-7");
 
         assertEquals("UFC 1 - The Beginning", ufc1.getName());
         assertEquals("Ultimate Fighting Championship", ufc1.getOrganization().getName());
@@ -113,7 +131,7 @@ public class ParserTest {
     public void testFighterParser() throws IOException, ParseException {
         //trying to test on a passed away fighter to make the data won't change
         //RIP Kevin
-        Fighter fighter = new FighterParser(Constants.FIGHTER_PICTURE_CACHE_FOLDER, ZoneId.of("Asia/Kuala_Lumpur")).parse("http://www.sherdog.com/fighter/Kevin-Randleman-162");
+        Fighter fighter = sherdog.getFighter("http://www.sherdog.com/fighter/Kevin-Randleman-162");
        // Fighter condit = new FighterParser(Constants.FIGHTER_PICTURE_CACHE_FOLDER, ZoneId.of("Asia/Kuala_Lumpur")).parse("http://www.sherdog.com/fighter/Bec-Rawlings-84964");
 
 
@@ -169,24 +187,5 @@ public class ParserTest {
         //assertTrue(fighter.getBirthday() == 0);
     }
 
-    @Test
-    public void testBuilder() throws IOException {
 
-        Sherdog parser = new Sherdog.Builder().withCacheFolder("cache-test").withTimezone("Asia/Kuala_Lumpur").build();
-
-//        Organization ufc = parser.getOrganization(Organizations.UFC.url);
-//
-//        Event ufc1 = parser.getEvent(ufc.getEvents().get(0).getSherdogUrl());
-//
-//        Fight firstFight = ufc1.getFights().get(0);
-//
-//        Fighter fighter = parser.getFighter(firstFight.getFighter1().getSherdogUrl());
-
-        assertEquals("cache-test/", parser.getCacheFolder());
-        assertEquals("Asia/Kuala_Lumpur", parser.getZoneId().getId());
-
-        File f = new File(parser.getCacheFolder());
-        assertTrue(f.exists());
-
-    }
 }

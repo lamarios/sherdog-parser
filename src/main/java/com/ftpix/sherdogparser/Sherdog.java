@@ -3,6 +3,7 @@ package com.ftpix.sherdogparser;
 import com.ftpix.sherdogparser.models.Event;
 import com.ftpix.sherdogparser.models.Fighter;
 import com.ftpix.sherdogparser.models.Organization;
+import com.ftpix.sherdogparser.models.Organizations;
 import com.ftpix.sherdogparser.parsers.EventParser;
 import com.ftpix.sherdogparser.parsers.FighterParser;
 import com.ftpix.sherdogparser.parsers.OrganizationParser;
@@ -14,6 +15,7 @@ import java.time.ZoneId;
 
 /**
  * Created by gz on 20-Aug-16.
+ * The main class of sherdog-parser
  */
 public class Sherdog {
     private String cacheFolder = Constants.FIGHTER_PICTURE_CACHE_FOLDER;
@@ -72,7 +74,19 @@ public class Sherdog {
      * @throws ParseException if the page structure has changed
      */
     public Organization getOrganization(String sherdogUrl) throws IOException, ParseException {
-        return new OrganizationParser().parse(sherdogUrl);
+        return new OrganizationParser(zoneId).parse(sherdogUrl);
+    }
+
+
+    /**
+     * Gets an organization via it's sherdog URL.
+     * @param organization An organization from the Organizations. enum
+     * @return an Organization
+     * @throws IOException if connecting to sherdog fails
+     * @throws ParseException if the page structure has changed
+     */
+    public Organization getOrganization(Organizations organization) throws IOException, ParseException {
+        return new OrganizationParser(zoneId).parse(organization.url);
     }
 
     /**
@@ -94,7 +108,7 @@ public class Sherdog {
      * @throws ParseException if the page structure has changed
      */
     public Fighter getFighter(String sherdogUrl) throws IOException, ParseException {
-        return new FighterParser(cacheFolder).parse(sherdogUrl);
+        return new FighterParser(cacheFolder, zoneId).parse(sherdogUrl);
     }
 
 

@@ -1,7 +1,6 @@
 package com.ftpix.sherdogparser.models;
 
 import java.time.ZonedDateTime;
-import java.util.Date;
 
 public class Fight {
     private SherdogBaseObject event;
@@ -81,10 +80,8 @@ public class Fight {
         try {
             Fight fight = (Fight) obj;
 
-            boolean equals = fight.getFighter1().getSherdogUrl().equalsIgnoreCase(fighter1.getSherdogUrl())
+            return fight.getFighter1().getSherdogUrl().equalsIgnoreCase(fighter1.getSherdogUrl())
                     && fight.getFighter2().getSherdogUrl().equalsIgnoreCase(fighter2.getSherdogUrl()) && event.getSherdogUrl().equals(fight.getEvent().getSherdogUrl());
-
-            return equals;
         } catch (Exception e) {
             return false;
         }

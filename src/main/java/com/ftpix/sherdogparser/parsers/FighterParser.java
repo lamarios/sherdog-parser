@@ -11,7 +11,6 @@ import org.apache.commons.io.FileUtils;
 import org.jsoup.Jsoup;
 import org.jsoup.nodes.Document;
 import org.jsoup.nodes.Element;
-import org.jsoup.parser.Parser;
 import org.jsoup.select.Elements;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -27,10 +26,10 @@ import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
-import java.util.Optional;
 
 /**
  * Created by gz on 20-Aug-16.
+ * Parse a fighter through a url
  */
 public class FighterParser implements SherdogParser<Fighter> {
     private final Logger logger = LoggerFactory.getLogger(FighterParser.class);
@@ -303,7 +302,7 @@ public class FighterParser implements SherdogParser<Fighter> {
      * @param s the string to hash
      * @return the hashed string
      */
-    public static String hash(String s) {
+    private String hash(String s) {
         return DigestUtils.sha256Hex(s);
     }
 }

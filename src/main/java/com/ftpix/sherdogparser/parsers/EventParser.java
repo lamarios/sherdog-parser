@@ -16,14 +16,13 @@ import org.slf4j.LoggerFactory;
 import java.io.IOException;
 import java.text.ParseException;
 import java.time.ZoneId;
-import java.time.ZonedDateTime;
 import java.time.format.DateTimeParseException;
 import java.util.ArrayList;
-import java.util.Collection;
 import java.util.List;
 
 /**
  * Created by gz on 20-Aug-16.
+ * Class to parse an event by using its sherdog url
  */
 public class EventParser implements SherdogParser<Event> {
     private final int FIGHTER1_COLUMN = 1, FIGHTER2_COLUMN = 3, METHOD_COLUMN = 4, ROUND_COLUMN = 5, TIME_COLUMN = 6;
@@ -97,7 +96,7 @@ public class EventParser implements SherdogParser<Event> {
         sEvent.setName(event.getName());
         sEvent.setSherdogUrl(event.getSherdogUrl());
 
-        List<Fight> fights = new ArrayList<Fight>();
+        List<Fight> fights = new ArrayList<>();
 
         //Checking on main event
         Elements mainFightElement = doc.select(".content.event");
@@ -156,9 +155,7 @@ public class EventParser implements SherdogParser<Event> {
         sEvent.setName(event.getName());
         sEvent.setSherdogUrl(event.getSherdogUrl());
 
-        List<Fight> fights = new ArrayList<Fight>();
-
-        int i = 1;
+        List<Fight> fights = new ArrayList<>();
 
         trs.remove(0);
 
@@ -189,7 +186,7 @@ public class EventParser implements SherdogParser<Event> {
     /**
      * Get a fighter
      * @param td element from sherdog's table
-     * @return
+     * @return return a sherdogbaseobject with the fighter name and url
      */
     private SherdogBaseObject getFighter(Element td) {
 
@@ -206,7 +203,7 @@ public class EventParser implements SherdogParser<Event> {
     /**
      * get the time at which teh fight finished
      * @param td element from sherdog's table
-     * @return
+     * @return get the time of the event
      */
     private String getTime(Element td) {
         return td.html();
@@ -226,7 +223,7 @@ public class EventParser implements SherdogParser<Event> {
     /**
      *
      * @param td element from sherdog's table
-     * @return
+     * @return get the win method
      */
     private String getMethod(Element td) {
         return td.html().replaceAll("<br>(.*)", "");

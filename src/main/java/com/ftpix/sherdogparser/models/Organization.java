@@ -6,7 +6,7 @@ import java.util.List;
 
 public class Organization extends SherdogBaseObject {
 
-    public List<Event> events = new ArrayList<Event>();
+    private List<Event> events = new ArrayList<>();
 
     public List<Event> getEvents() {
         return events;

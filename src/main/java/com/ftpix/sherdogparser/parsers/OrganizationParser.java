@@ -3,6 +3,7 @@ package com.ftpix.sherdogparser.parsers;
 import com.ftpix.sherdogparser.Constants;
 import com.ftpix.sherdogparser.models.Event;
 import com.ftpix.sherdogparser.models.Organization;
+import com.ftpix.sherdogparser.models.SherdogBaseObject;
 
 import org.jsoup.Jsoup;
 import org.jsoup.nodes.Document;
@@ -13,27 +14,20 @@ import org.slf4j.LoggerFactory;
 
 import java.io.IOException;
 import java.text.ParseException;
-import java.text.SimpleDateFormat;
-import java.time.Instant;
-import java.time.OffsetDateTime;
 import java.time.ZoneId;
 import java.time.ZonedDateTime;
-import java.time.format.DateTimeFormatter;
 import java.time.format.DateTimeParseException;
 import java.util.ArrayList;
-import java.util.Date;
 import java.util.List;
-import java.util.TimeZone;
 
 /**
  * Created by gz on 20-Aug-16.
+ * PArser to parse an organization
  */
 public class OrganizationParser implements SherdogParser<Organization> {
     private final Logger logger = LoggerFactory.getLogger(OrganizationParser.class);
 
     private final int DATE_COLUMN = 0, NAME_COLUMN = 1, LOCATION_COLUMN = 2;
-    private final DateTimeFormatter df = DateTimeFormatter.ofPattern("yyyy-MM-dd' 'HH:mm:ss");
-    //private final SimpleDateFormat df2 = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
 
     private final ZoneId ZONE_ID;
 
@@ -76,18 +70,17 @@ public class OrganizationParser implements SherdogParser<Organization> {
 
         logger.info("Getting upcoming event");
         Elements upcomingEventsElement = doc.select("#upcoming_tab .event tr");
-        organization.getEvents().addAll(parseEvent(upcomingEventsElement));
+        organization.getEvents().addAll(parseEvent(upcomingEventsElement, organization));
 
         logger.info("Getting past events");
         List<Event> toAdd;
         do {
             logger.info("Parsing page [{}]", page);
 
-            toAdd = new ArrayList<>();
             doc = Jsoup.connect(url + page).timeout(Constants.PARSING_TIMEOUT).get();
             Elements events = doc.select("#recent_tab .event tr");
 
-            toAdd = parseEvent(events);
+            toAdd = parseEvent(events, organization);
 
             organization.getEvents().addAll(toAdd);
             page++;
@@ -108,10 +101,17 @@ public class OrganizationParser implements SherdogParser<Organization> {
      * @return a list of events
      * @throws ParseException if something is wrong with sherdog layout
      */
-    private List<Event> parseEvent(Elements trs) throws ParseException {
-        List<Event> events = new ArrayList<Event>();
+    private List<Event> parseEvent(Elements trs, Organization organization) throws ParseException {
+        List<Event> events = new ArrayList<>();
 
         trs.remove(0);
+
+
+        SherdogBaseObject sOrg = new SherdogBaseObject();
+        sOrg.setName(organization.getName());
+        sOrg.setSherdogUrl(organization.getSherdogUrl());
+
+
 
         trs.forEach(tr -> {
 
@@ -119,6 +119,7 @@ public class OrganizationParser implements SherdogParser<Organization> {
             boolean addEvent = true;
             Elements tds = tr.select("td");
 
+            event.setOrganization(sOrg);
 
             event.setName(getEventName(tds.get(NAME_COLUMN)));
             event.setSherdogUrl(getEventUrl(tds.get(NAME_COLUMN)));

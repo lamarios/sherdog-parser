@@ -5,8 +5,9 @@ import java.text.ParseException;
 
 /**
  * Created by gz on 20-Aug-16.
+ * teh default interface for a shergod parser
  */
-public interface SherdogParser<T> {
+interface SherdogParser<T> {
 
     /**
      * Parse a sherdog page

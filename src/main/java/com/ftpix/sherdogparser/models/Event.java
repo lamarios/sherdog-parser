@@ -1,9 +1,7 @@
 package com.ftpix.sherdogparser.models;
 
-import java.nio.channels.Pipe;
 import java.time.ZonedDateTime;
 import java.util.ArrayList;
-import java.util.Date;
 import java.util.List;
 
 
@@ -61,11 +59,8 @@ public class Event extends  SherdogBaseObject{
 
     @Override
     public String toString() {
-        System.out.println("Org:"+organization);
-        System.out.println("Date:"+date);
-        System.out.println("Fights:" + fights);
-        System.out.println("Location:"+location);
         return "Event{" +
+                "name=" + name +
                 "organization=" + organization +
                 ", date=" + date +
                 ", fights=" + fights +

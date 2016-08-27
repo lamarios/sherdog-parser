@@ -1,10 +1,8 @@
 package com.ftpix.sherdogparser.models;
 
-/**
- * Created by gz on 21-Aug-16.
- */
+
 public class SherdogBaseObject {
-    protected String name, sherdogUrl;
+    String name, sherdogUrl;
 
     public String getName() {
         return name;
