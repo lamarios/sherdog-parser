@@ -1,0 +1,130 @@
+<?xml version="1.0" encoding="UTF-8"?><!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"><html xmlns="http://www.w3.org/1999/xhtml" lang="en"><head><meta http-equiv="Content-Type" content="text/html;charset=UTF-8"/><link rel="stylesheet" href="../jacoco-resources/report.css" type="text/css"/><link rel="shortcut icon" href="../jacoco-resources/report.gif" type="image/gif"/><title>Fighter.java</title><link rel="stylesheet" href="../jacoco-resources/prettify.css" type="text/css"/><script type="text/javascript" src="../jacoco-resources/prettify.js"></script></head><body onload="window['PR_TAB_WIDTH']=4;prettyPrint()"><div class="breadcrumb" id="breadcrumb"><span class="info"><a href="../jacoco-sessions.html" class="el_session">Sessions</a></span><a href="../index.html" class="el_report">sherdog-parser</a> &gt; <a href="index.source.html" class="el_package">com.ftpix.sherdogparser.models</a> &gt; <span class="el_source">Fighter.java</span></div><h1>Fighter.java</h1><pre class="source lang-java linenums">package com.ftpix.sherdogparser.models;
+
+import java.util.ArrayList;
+import java.util.Date;
+import java.util.List;
+
+
+<span class="fc" id="L8">public class Fighter extends SherdogBaseObject {</span>
+
+<span class="fc" id="L10">    private String nickname = &quot;&quot;;</span>
+<span class="fc" id="L11">    private String height = &quot;&quot;;</span>
+<span class="fc" id="L12">    private String weight = &quot;&quot;;</span>
+    private Date birthday;
+<span class="fc" id="L14">    private int wins = 0;</span>
+<span class="fc" id="L15">    private int losses = 0;</span>
+<span class="fc" id="L16">    private int draws = 0;</span>
+<span class="fc" id="L17">    private int nc = 0;</span>
+<span class="fc" id="L18">    private String picture = &quot;&quot;;</span>
+<span class="fc" id="L19">    private List&lt;Fight&gt; fights = new ArrayList&lt;&gt;();</span>
+
+
+
+    public String getNickname() {
+<span class="fc" id="L24">        return nickname;</span>
+    }
+
+    public void setNickname(String nickname) {
+<span class="fc" id="L28">        this.nickname = nickname;</span>
+<span class="fc" id="L29">    }</span>
+
+    public String getHeight() {
+<span class="fc" id="L32">        return height;</span>
+    }
+
+    public void setHeight(String height) {
+<span class="fc" id="L36">        this.height = height;</span>
+<span class="fc" id="L37">    }</span>
+
+    public String getWeight() {
+<span class="fc" id="L40">        return weight;</span>
+    }
+
+    public void setWeight(String weight) {
+<span class="fc" id="L44">        this.weight = weight;</span>
+<span class="fc" id="L45">    }</span>
+
+    public Date getBirthday() {
+<span class="nc" id="L48">        return birthday;</span>
+    }
+
+    public void setBirthday(Date birthday) {
+<span class="fc" id="L52">        this.birthday = birthday;</span>
+<span class="fc" id="L53">    }</span>
+
+    public int getWins() {
+<span class="fc" id="L56">        return wins;</span>
+    }
+
+    public void setWins(int wins) {
+<span class="fc" id="L60">        this.wins = wins;</span>
+<span class="fc" id="L61">    }</span>
+
+    public int getLosses() {
+<span class="fc" id="L64">        return losses;</span>
+    }
+
+    public void setLosses(int losses) {
+<span class="fc" id="L68">        this.losses = losses;</span>
+<span class="fc" id="L69">    }</span>
+
+    public int getDraws() {
+<span class="fc" id="L72">        return draws;</span>
+    }
+
+    public void setDraws(int draws) {
+<span class="nc" id="L76">        this.draws = draws;</span>
+<span class="nc" id="L77">    }</span>
+
+    public int getNc() {
+<span class="fc" id="L80">        return nc;</span>
+    }
+
+    public void setNc(int nc) {
+<span class="nc" id="L84">        this.nc = nc;</span>
+<span class="nc" id="L85">    }</span>
+
+    public String getPicture() {
+<span class="fc" id="L88">        return picture;</span>
+    }
+
+    public void setPicture(String picture) {
+<span class="fc" id="L92">        this.picture = picture;</span>
+<span class="fc" id="L93">    }</span>
+
+    public List&lt;Fight&gt; getFights() {
+<span class="fc" id="L96">        return fights;</span>
+    }
+
+    public void setFights(List&lt;Fight&gt; fights) {
+<span class="fc" id="L100">        this.fights = fights;</span>
+<span class="fc" id="L101">    }</span>
+
+    @Override
+    public boolean equals(Object obj) {
+        try {
+<span class="nc" id="L106">            Fighter fighter = (Fighter) obj;</span>
+<span class="nc" id="L107">            return fighter.getSherdogUrl().equalsIgnoreCase(this.sherdogUrl);</span>
+<span class="nc" id="L108">        } catch (Exception e) {</span>
+<span class="nc" id="L109">            return false;</span>
+        }
+    }
+
+    @Override
+    public String toString() {
+<span class="nc" id="L115">        return &quot;Fighter{&quot; +</span>
+                &quot;name='&quot; + name + '\'' +
+                &quot;, nickname='&quot; + nickname + '\'' +
+                &quot;, height='&quot; + height + '\'' +
+                &quot;, weight='&quot; + weight + '\'' +
+                &quot;, birthday=&quot; + birthday +
+                &quot;, wins=&quot; + wins +
+                &quot;, losses=&quot; + losses +
+                &quot;, draws=&quot; + draws +
+                &quot;, nc=&quot; + nc +
+                &quot;, picture='&quot; + picture + '\'' +
+                &quot;, sherdogUrl='&quot; + sherdogUrl + '\'' +
+                '}';
+    }
+}
+</pre><div class="footer"><span class="right">Created with <a href="http://www.eclemma.org/jacoco">JaCoCo</a> 0.7.7.201606060606</span></div></body></html>
