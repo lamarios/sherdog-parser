@@ -3,6 +3,7 @@
 import com.ftpix.sherdogparser.models.Event;
 import com.ftpix.sherdogparser.models.Fighter;
 import com.ftpix.sherdogparser.models.Organization;
+import com.ftpix.sherdogparser.models.Organizations;
 import com.ftpix.sherdogparser.parsers.EventParser;
 import com.ftpix.sherdogparser.parsers.FighterParser;
 import com.ftpix.sherdogparser.parsers.OrganizationParser;
@@ -14,10 +15,11 @@ import java.time.ZoneId;
 
 /**
  * Created by gz on 20-Aug-16.
+ * The main class of sherdog-parser
  */
-<span class="fc" id="L18">public class Sherdog {</span>
-<span class="fc" id="L19">    private String cacheFolder = Constants.FIGHTER_PICTURE_CACHE_FOLDER;</span>
-<span class="fc" id="L20">    private ZoneId zoneId = ZoneId.systemDefault();</span>
+<span class="fc" id="L20">public class Sherdog {</span>
+<span class="fc" id="L21">    private String cacheFolder = Constants.FIGHTER_PICTURE_CACHE_FOLDER;</span>
+<span class="fc" id="L22">    private ZoneId zoneId = ZoneId.systemDefault();</span>
 
 
     /**
@@ -25,7 +27,7 @@ import java.time.ZoneId;
      * @return the path of the cache folder
      */
     public String getCacheFolder() {
-<span class="fc" id="L28">        return cacheFolder;</span>
+<span class="fc" id="L30">        return cacheFolder;</span>
     }
 
 
@@ -34,25 +36,25 @@ import java.time.ZoneId;
      * @param cacheFolder where to cache fighter pictures
      */
     public void setCacheFolder(String cacheFolder) {
-<span class="pc bpc" id="L37" title="1 of 2 branches missed.">        if (!cacheFolder.endsWith(&quot;/&quot;)) {</span>
-<span class="fc" id="L38">            cacheFolder += &quot;/&quot;;</span>
+<span class="pc bpc" id="L39" title="1 of 2 branches missed.">        if (!cacheFolder.endsWith(&quot;/&quot;)) {</span>
+<span class="fc" id="L40">            cacheFolder += &quot;/&quot;;</span>
         }
 
-<span class="fc" id="L41">        File f = new File(cacheFolder);</span>
+<span class="fc" id="L43">        File f = new File(cacheFolder);</span>
 
-<span class="pc bpc" id="L43" title="1 of 2 branches missed.">        if (!f.exists()) {</span>
-<span class="fc" id="L44">            f.mkdirs();</span>
+<span class="pc bpc" id="L45" title="1 of 2 branches missed.">        if (!f.exists()) {</span>
+<span class="nc" id="L46">            f.mkdirs();</span>
         }
 
-<span class="fc" id="L47">        this.cacheFolder = cacheFolder;</span>
-<span class="fc" id="L48">    }</span>
+<span class="fc" id="L49">        this.cacheFolder = cacheFolder;</span>
+<span class="fc" id="L50">    }</span>
 
     /**
      * Gets the zone id
      * @return the current zoneid
      */
     public ZoneId getZoneId() {
-<span class="fc" id="L55">        return zoneId;</span>
+<span class="fc" id="L57">        return zoneId;</span>
     }
 
     /**
@@ -60,8 +62,8 @@ import java.time.ZoneId;
      * @param zoneId which zone id the event times need to be converted
      */
     public void setZoneId(ZoneId zoneId) {
-<span class="fc" id="L63">        this.zoneId = zoneId;</span>
-<span class="fc" id="L64">    }</span>
+<span class="fc" id="L65">        this.zoneId = zoneId;</span>
+<span class="fc" id="L66">    }</span>
 
 
     /**
@@ -72,7 +74,19 @@ import java.time.ZoneId;
      * @throws ParseException if the page structure has changed
      */
     public Organization getOrganization(String sherdogUrl) throws IOException, ParseException {
-<span class="nc" id="L75">        return new OrganizationParser().parse(sherdogUrl);</span>
+<span class="nc" id="L77">        return new OrganizationParser(zoneId).parse(sherdogUrl);</span>
+    }
+
+
+    /**
+     * Gets an organization via it's sherdog URL.
+     * @param organization An organization from the Organizations. enum
+     * @return an Organization
+     * @throws IOException if connecting to sherdog fails
+     * @throws ParseException if the page structure has changed
+     */
+    public Organization getOrganization(Organizations organization) throws IOException, ParseException {
+<span class="fc" id="L89">        return new OrganizationParser(zoneId).parse(organization.url);</span>
     }
 
     /**
@@ -83,7 +97,7 @@ import java.time.ZoneId;
      * @throws ParseException if the page structure has changed
      */
     public Event getEvent(String sherdogUrl) throws IOException, ParseException {
-<span class="nc" id="L86">        return new EventParser(zoneId).parse(sherdogUrl);</span>
+<span class="fc" id="L100">        return new EventParser(zoneId).parse(sherdogUrl);</span>
     }
 
     /**
@@ -94,15 +108,15 @@ import java.time.ZoneId;
      * @throws ParseException if the page structure has changed
      */
     public Fighter getFighter(String sherdogUrl) throws IOException, ParseException {
-<span class="nc" id="L97">        return new FighterParser(cacheFolder).parse(sherdogUrl);</span>
+<span class="fc" id="L111">        return new FighterParser(cacheFolder, zoneId).parse(sherdogUrl);</span>
     }
 
 
     /**
      * Builder
      */
-<span class="fc" id="L104">    public static class Builder {</span>
-<span class="fc" id="L105">        private Sherdog parser = new Sherdog();</span>
+<span class="fc" id="L118">    public static class Builder {</span>
+<span class="fc" id="L119">        private Sherdog parser = new Sherdog();</span>
 
         /**
          * Sets a cache folder for the parser
@@ -110,8 +124,8 @@ import java.time.ZoneId;
          * @return the sherdog current state
          */
         public Builder withCacheFolder(String folder) {
-<span class="fc" id="L113">            parser.setCacheFolder(folder);</span>
-<span class="fc" id="L114">            return this;</span>
+<span class="fc" id="L127">            parser.setCacheFolder(folder);</span>
+<span class="fc" id="L128">            return this;</span>
         }
 
 
@@ -121,12 +135,12 @@ import java.time.ZoneId;
          * @return the sherdog current state
          */
         public Builder withTimezone(String timezone) {
-<span class="fc" id="L124">            parser.setZoneId(ZoneId.of(timezone));</span>
-<span class="fc" id="L125">            return this;</span>
+<span class="fc" id="L138">            parser.setZoneId(ZoneId.of(timezone));</span>
+<span class="fc" id="L139">            return this;</span>
         }
 
         public Sherdog build() {
-<span class="fc" id="L129">            return parser;</span>
+<span class="fc" id="L143">            return parser;</span>
         }
 
 

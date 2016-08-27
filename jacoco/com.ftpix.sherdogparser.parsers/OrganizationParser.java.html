@@ -3,6 +3,7 @@
 import com.ftpix.sherdogparser.Constants;
 import com.ftpix.sherdogparser.models.Event;
 import com.ftpix.sherdogparser.models.Organization;
+import com.ftpix.sherdogparser.models.SherdogBaseObject;
 
 import org.jsoup.Jsoup;
 import org.jsoup.nodes.Document;
@@ -13,27 +14,20 @@ import org.slf4j.LoggerFactory;
 
 import java.io.IOException;
 import java.text.ParseException;
-import java.text.SimpleDateFormat;
-import java.time.Instant;
-import java.time.OffsetDateTime;
 import java.time.ZoneId;
 import java.time.ZonedDateTime;
-import java.time.format.DateTimeFormatter;
 import java.time.format.DateTimeParseException;
 import java.util.ArrayList;
-import java.util.Date;
 import java.util.List;
-import java.util.TimeZone;
 
 /**
  * Created by gz on 20-Aug-16.
+ * PArser to parse an organization
  */
 public class OrganizationParser implements SherdogParser&lt;Organization&gt; {
-<span class="pc" id="L32">    private final Logger logger = LoggerFactory.getLogger(OrganizationParser.class);</span>
+<span class="pc" id="L28">    private final Logger logger = LoggerFactory.getLogger(OrganizationParser.class);</span>
 
-<span class="pc" id="L34">    private final int DATE_COLUMN = 1, NAME_COLUMN = 2, LOCATION_COLUMN = 3;</span>
-<span class="pc" id="L35">    private final DateTimeFormatter df = DateTimeFormatter.ofPattern(&quot;yyyy-MM-dd' 'HH:mm:ss&quot;);</span>
-    //private final SimpleDateFormat df2 = new SimpleDateFormat(&quot;yyyy-MM-dd HH:mm:ss&quot;);
+<span class="pc" id="L30">    private final int DATE_COLUMN = 0, NAME_COLUMN = 1, LOCATION_COLUMN = 2;</span>
 
     private final ZoneId ZONE_ID;
 
@@ -41,16 +35,16 @@ public class OrganizationParser implements SherdogParser&lt;Organization&gt; {
     /**
      * Creates an organization parser with the default zone id
      */
-<span class="fc" id="L44">    public OrganizationParser() {</span>
-<span class="fc" id="L45">        ZONE_ID = ZoneId.systemDefault();</span>
-<span class="fc" id="L46">    }</span>
+<span class="nc" id="L38">    public OrganizationParser() {</span>
+<span class="nc" id="L39">        ZONE_ID = ZoneId.systemDefault();</span>
+<span class="nc" id="L40">    }</span>
 
     /**
      * Create a parser with a specified zoneid
      */
-<span class="nc" id="L51">    public OrganizationParser(ZoneId zoneId) {</span>
-<span class="nc" id="L52">        this.ZONE_ID = zoneId;</span>
-<span class="nc" id="L53">    }</span>
+<span class="fc" id="L45">    public OrganizationParser(ZoneId zoneId) {</span>
+<span class="fc" id="L46">        this.ZONE_ID = zoneId;</span>
+<span class="fc" id="L47">    }</span>
 
     /**
      * Parse a sherdog page
@@ -60,121 +54,116 @@ public class OrganizationParser implements SherdogParser&lt;Organization&gt; {
      * @throws ParseException if the page structure has changed
      */
     public Organization parse(String url) throws IOException, ParseException {
-<span class="fc" id="L63">        Organization organization = new Organization();</span>
-<span class="fc" id="L64">        organization.setSherdogUrl(url);</span>
+<span class="fc" id="L57">        Organization organization = new Organization();</span>
+<span class="fc" id="L58">        organization.setSherdogUrl(url);</span>
 
-<span class="fc" id="L66">        url += &quot;/recent-events/&quot;;</span>
-<span class="fc" id="L67">        int page = 1;</span>
-
-
-<span class="fc" id="L70">        Document doc = Jsoup.connect(url + page).timeout(Constants.PARSING_TIMEOUT).get();</span>
-
-<span class="fc" id="L72">        logger.info(&quot;Getting name&quot;);</span>
-<span class="fc" id="L73">        Elements name = doc.select(&quot;.bio_organization .module_header h2[itemprop=\&quot;name\&quot;&quot;);</span>
-<span class="fc" id="L74">        organization.setName(name.html());</span>
+<span class="fc" id="L60">        url += &quot;/recent-events/&quot;;</span>
+<span class="fc" id="L61">        int page = 1;</span>
 
 
-<span class="fc" id="L77">        logger.info(&quot;Getting upcoming event&quot;);</span>
-<span class="fc" id="L78">        Elements upcomingEventsElement = doc.select(&quot;#upcoming_tab .event td&quot;);</span>
-<span class="fc" id="L79">        organization.getEvents().addAll(parseEvent(upcomingEventsElement));</span>
+<span class="fc" id="L64">        Document doc = Jsoup.connect(url + page).timeout(Constants.PARSING_TIMEOUT).get();</span>
 
-<span class="fc" id="L81">        logger.info(&quot;Getting past events&quot;);</span>
+<span class="fc" id="L66">        logger.info(&quot;Getting name&quot;);</span>
+<span class="fc" id="L67">        Elements name = doc.select(&quot;.bio_organization .module_header h2[itemprop=\&quot;name\&quot;&quot;);</span>
+<span class="fc" id="L68">        organization.setName(name.html());</span>
+
+
+<span class="fc" id="L71">        logger.info(&quot;Getting upcoming event&quot;);</span>
+<span class="fc" id="L72">        Elements upcomingEventsElement = doc.select(&quot;#upcoming_tab .event tr&quot;);</span>
+<span class="fc" id="L73">        organization.getEvents().addAll(parseEvent(upcomingEventsElement, organization));</span>
+
+<span class="fc" id="L75">        logger.info(&quot;Getting past events&quot;);</span>
         List&lt;Event&gt; toAdd;
         do {
-<span class="fc" id="L84">            logger.info(&quot;Parsing page [{}]&quot;, page);</span>
+<span class="fc" id="L78">            logger.info(&quot;Parsing page [{}]&quot;, page);</span>
 
-<span class="fc" id="L86">            toAdd = new ArrayList&lt;&gt;();</span>
-<span class="fc" id="L87">            doc = Jsoup.connect(url + page).timeout(Constants.PARSING_TIMEOUT).get();</span>
-<span class="fc" id="L88">            Elements events = doc.select(&quot;#recent_tab .event td&quot;);</span>
+<span class="fc" id="L80">            doc = Jsoup.connect(url + page).timeout(Constants.PARSING_TIMEOUT).get();</span>
+<span class="fc" id="L81">            Elements events = doc.select(&quot;#recent_tab .event tr&quot;);</span>
 
-<span class="fc" id="L90">            toAdd = parseEvent(events);</span>
+<span class="fc" id="L83">            toAdd = parseEvent(events, organization);</span>
 
-<span class="fc" id="L92">            organization.getEvents().addAll(toAdd);</span>
-<span class="fc" id="L93">            page++;</span>
-
-
-<span class="fc bfc" id="L96" title="All 2 branches covered.">        } while (toAdd.size() &gt; 0);</span>
+<span class="fc" id="L85">            organization.getEvents().addAll(toAdd);</span>
+<span class="fc" id="L86">            page++;</span>
 
 
-<span class="fc" id="L99">        organization.getEvents().sort((o1, o2) -&gt; o1.getDate().compareTo(o2.getDate()));</span>
-<span class="fc" id="L100">        return organization;</span>
+<span class="fc bfc" id="L89" title="All 2 branches covered.">        } while (toAdd.size() &gt; 0);</span>
+
+
+<span class="fc" id="L92">        organization.getEvents().sort((o1, o2) -&gt; o1.getDate().compareTo(o2.getDate()));</span>
+<span class="fc" id="L93">        return organization;</span>
     }
 
 
     /**
      * Get all the events of an organization
      *
-     * @param td the JSOUP TD elements from the event table
+     * @param trs the JSOUP TR elements from the event table
      * @return a list of events
      * @throws ParseException if something is wrong with sherdog layout
      */
-    private List&lt;Event&gt; parseEvent(Elements td) throws ParseException {
-<span class="fc" id="L112">        List&lt;Event&gt; events = new ArrayList&lt;Event&gt;();</span>
+    private List&lt;Event&gt; parseEvent(Elements trs, Organization organization) throws ParseException {
+<span class="fc" id="L105">        List&lt;Event&gt; events = new ArrayList&lt;&gt;();</span>
 
-<span class="fc" id="L114">        int i = 1;</span>
-<span class="fc" id="L115">        td.remove(0);</span>
-<span class="fc" id="L116">        td.remove(0);</span>
-<span class="fc" id="L117">        td.remove(0);</span>
-<span class="fc" id="L118">        Event event = new Event();</span>
-<span class="fc" id="L119">        boolean addEvent = true;</span>
-<span class="fc bfc" id="L120" title="All 2 branches covered.">        for (Element element : td) {</span>
-<span class="pc bpc" id="L121" title="1 of 4 branches missed.">            switch (i) {</span>
-                case DATE_COLUMN:
-<span class="fc" id="L123">                    Elements metaDate = element.select(&quot;meta[itemprop=\&quot;startDate\&quot;&quot;);</span>
-<span class="fc" id="L124">                    String date = metaDate.get(0).attr(&quot;content&quot;);</span>
-                    // Date eventDate = df.parse(date);
-
-                    //OffsetDateTime odt = OffsetDateTime.parse( date );
-                    //ZonedDateTime usDate = odt.atZoneSameInstant(ZoneId.of(Constants.SHERDOG_TIME_ZONE));
-
-                    // ZonedDateTime usDate = ZonedDateTime.ofInstant(eventDate.toInstant(), );
-                    //System.out.println(usDate);
-                    // event.setDate(usDate);
-                    try {
-<span class="fc" id="L134">                        event.setDate(ParserUtils.getDateFromStringToZoneId(date, ZONE_ID));</span>
-<span class="fc" id="L135">                    } catch (DateTimeParseException e) {</span>
-<span class="fc" id="L136">                        logger.error(&quot;Couldn't fornat date, we shouldn't add the event&quot;, e);</span>
-<span class="fc" id="L137">                        addEvent = false;</span>
-<span class="fc" id="L138">                    }</span>
-<span class="fc" id="L139">                    break;</span>
-                case NAME_COLUMN:
-<span class="fc" id="L141">                    Elements name = element.select(&quot;span[itemprop=\&quot;name\&quot;&quot;);</span>
-<span class="fc" id="L142">                    event.setName(name.get(0).html());</span>
+<span class="fc" id="L107">        trs.remove(0);</span>
 
 
-<span class="fc" id="L145">                    event.setName(event.getName().replaceAll(&quot;( )+&quot;, &quot; &quot;));</span>
-<span class="fc" id="L146">                    event.setName(event.getName().trim());</span>
-<span class="fc" id="L147">                    Elements url = element.select(&quot;a[itemprop=\&quot;url\&quot;&quot;);</span>
-<span class="fc" id="L148">                    event.setSherdogUrl(url.get(0).attr(&quot;abs:href&quot;));</span>
-<span class="fc" id="L149">                    break;</span>
-                case LOCATION_COLUMN:
-<span class="fc" id="L151">                    String[] split = element.html().split(&quot;&gt;&quot;);</span>
-<span class="fc" id="L152">                    event.setLocation(split[1].trim());</span>
-<span class="fc" id="L153">                    break;</span>
-                default:
-                    break;
+<span class="fc" id="L110">        SherdogBaseObject sOrg = new SherdogBaseObject();</span>
+<span class="fc" id="L111">        sOrg.setName(organization.getName());</span>
+<span class="fc" id="L112">        sOrg.setSherdogUrl(organization.getSherdogUrl());</span>
+
+
+
+<span class="fc" id="L116">        trs.forEach(tr -&gt; {</span>
+
+<span class="fc" id="L118">            Event event = new Event();</span>
+<span class="fc" id="L119">            boolean addEvent = true;</span>
+<span class="fc" id="L120">            Elements tds = tr.select(&quot;td&quot;);</span>
+
+<span class="fc" id="L122">            event.setOrganization(sOrg);</span>
+
+<span class="fc" id="L124">            event.setName(getEventName(tds.get(NAME_COLUMN)));</span>
+<span class="fc" id="L125">            event.setSherdogUrl(getEventUrl(tds.get(NAME_COLUMN)));</span>
+<span class="fc" id="L126">            event.setLocation(getElementLocation(tds.get(LOCATION_COLUMN)));</span>
+
+            try {
+<span class="fc" id="L129">                event.setDate(getEventDate(tds.get(DATE_COLUMN)));</span>
+<span class="fc" id="L130">            } catch (DateTimeParseException e) {</span>
+<span class="fc" id="L131">                logger.error(&quot;Couldn't fornat date, we shouldn't add the event&quot;, e);</span>
+<span class="fc" id="L132">                addEvent = false;</span>
+<span class="fc" id="L133">            }</span>
+
+<span class="fc bfc" id="L135" title="All 2 branches covered.">            if (addEvent) {</span>
+<span class="fc" id="L136">                events.add(event);</span>
             }
-<span class="fc" id="L157">            i++;</span>
-<span class="fc bfc" id="L158" title="All 2 branches covered.">            if (i == 4) {</span>
-                // event.setOrganization(organization);
+<span class="fc" id="L138">        });</span>
 
-                // Date local = DateUtils.convertTimeZone(event.getDate(),
-                // TimeZone.getTimeZone(Constants.SHERDOG_TIME_ZONE),
-                // TimeZone.getDefault());
-                // logger.info(&quot;Event date: Sherdog:{}, local:{}&quot;,
-                // event.getDate(), local);
 
-<span class="fc bfc" id="L167" title="All 2 branches covered.">                if (addEvent) {</span>
-<span class="fc" id="L168">                    logger.info(&quot;Adding event {}&quot;, event.getName());</span>
-<span class="fc" id="L169">                    events.add(event);</span>
-                }
-<span class="fc" id="L171">                event = new Event();</span>
-<span class="fc" id="L172">                i = 1;</span>
-            }
-            // logger.info(element.html());
-<span class="fc" id="L175">        }</span>
+<span class="fc" id="L141">        return events;</span>
+    }
 
-<span class="fc" id="L177">        return events;</span>
+    private String getElementLocation(Element td) {
+<span class="fc" id="L145">        String[] split = td.html().split(&quot;&gt;&quot;);</span>
+<span class="fc" id="L146">        return split[1].trim();</span>
+    }
+
+    private String getEventName(Element td) {
+<span class="fc" id="L150">        Elements nameElement = td.select(&quot;span[itemprop=\&quot;name\&quot;&quot;);</span>
+<span class="fc" id="L151">        String name = nameElement.get(0).html();</span>
+<span class="fc" id="L152">        name = name.replaceAll(&quot;( )+&quot;, &quot; &quot;).trim();</span>
+
+<span class="fc" id="L154">        return name;</span>
+    }
+
+    private String getEventUrl(Element td) {
+<span class="fc" id="L158">        Elements url = td.select(&quot;a[itemprop=\&quot;url\&quot;&quot;);</span>
+<span class="fc" id="L159">        return url.get(0).attr(&quot;abs:href&quot;);</span>
+    }
+
+    private ZonedDateTime getEventDate(Element element) {
+<span class="fc" id="L163">        Elements metaDate = element.select(&quot;meta[itemprop=\&quot;startDate\&quot;&quot;);</span>
+<span class="fc" id="L164">        String date = metaDate.get(0).attr(&quot;content&quot;);</span>
+
+<span class="fc" id="L166">        return ParserUtils.getDateFromStringToZoneId(date, ZONE_ID);</span>
     }
 }
 </pre><div class="footer"><span class="right">Created with <a href="http://www.eclemma.org/jacoco">JaCoCo</a> 0.7.7.201606060606</span></div></body></html>

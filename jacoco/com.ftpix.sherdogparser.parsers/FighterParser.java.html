@@ -2,6 +2,7 @@
 
 import com.ftpix.sherdogparser.Constants;
 import com.ftpix.sherdogparser.models.Fight;
+import com.ftpix.sherdogparser.models.FightResult;
 import com.ftpix.sherdogparser.models.Fighter;
 import com.ftpix.sherdogparser.models.SherdogBaseObject;
 
@@ -10,7 +11,6 @@ import org.apache.commons.io.FileUtils;
 import org.jsoup.Jsoup;
 import org.jsoup.nodes.Document;
 import org.jsoup.nodes.Element;
-import org.jsoup.parser.Parser;
 import org.jsoup.select.Elements;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -21,47 +21,48 @@ import java.net.URL;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.time.ZoneId;
+import java.time.ZonedDateTime;
 import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
-import java.util.Optional;
 
 /**
  * Created by gz on 20-Aug-16.
+ * Parse a fighter through a url
  */
 public class FighterParser implements SherdogParser&lt;Fighter&gt; {
-<span class="pc" id="L34">    private final Logger logger = LoggerFactory.getLogger(FighterParser.class);</span>
-<span class="pc" id="L35">    private final SimpleDateFormat df = new SimpleDateFormat(&quot;yyyy-dd-MM&quot;);</span>
+<span class="pc" id="L35">    private final Logger logger = LoggerFactory.getLogger(FighterParser.class);</span>
+<span class="pc" id="L36">    private final SimpleDateFormat df = new SimpleDateFormat(&quot;yyyy-dd-MM&quot;);</span>
 
     private final String CACHE_FOLDER;
     private final ZoneId ZONE_ID;
-<span class="pc" id="L39">    private final int COLUMN_RESULT = 0, COLUMN_OPPONENT = 1, COLUMN_EVENT = 2, COLUMN_METHOD = 3, COLUMN_ROUND = 4, COLUMN_TIME = 5;</span>
+<span class="pc" id="L40">    private final int COLUMN_RESULT = 0, COLUMN_OPPONENT = 1, COLUMN_EVENT = 2, COLUMN_METHOD = 3, COLUMN_ROUND = 4, COLUMN_TIME = 5;</span>
 
     /**
      * Create a fight parser with a specified cache folder
      */
-<span class="nc" id="L44">    public FighterParser(String cacheFolder) {</span>
-<span class="nc" id="L45">        this.CACHE_FOLDER = cacheFolder;</span>
-<span class="nc" id="L46">        ZONE_ID = ZoneId.systemDefault();</span>
-<span class="nc" id="L47">    }</span>
+<span class="nc" id="L45">    public FighterParser(String cacheFolder) {</span>
+<span class="nc" id="L46">        this.CACHE_FOLDER = cacheFolder;</span>
+<span class="nc" id="L47">        ZONE_ID = ZoneId.systemDefault();</span>
+<span class="nc" id="L48">    }</span>
 
     /**
      * Generates a fight parser with specified cache folder and zone id
      */
-<span class="fc" id="L52">    public FighterParser(String cacheFolder, ZoneId zoneId) {</span>
-<span class="fc" id="L53">        this.CACHE_FOLDER = cacheFolder;</span>
-<span class="fc" id="L54">        this.ZONE_ID = zoneId;</span>
-<span class="fc" id="L55">    }</span>
+<span class="fc" id="L53">    public FighterParser(String cacheFolder, ZoneId zoneId) {</span>
+<span class="fc" id="L54">        this.CACHE_FOLDER = cacheFolder;</span>
+<span class="fc" id="L55">        this.ZONE_ID = zoneId;</span>
+<span class="fc" id="L56">    }</span>
 
     /**
      * FighterPArser with default cache folder location
      */
-<span class="nc" id="L60">    public FighterParser() {</span>
-<span class="nc" id="L61">        this.CACHE_FOLDER = Constants.FIGHTER_PICTURE_CACHE_FOLDER;</span>
-<span class="nc" id="L62">        ZONE_ID = ZoneId.systemDefault();</span>
+<span class="nc" id="L61">    public FighterParser() {</span>
+<span class="nc" id="L62">        this.CACHE_FOLDER = Constants.FIGHTER_PICTURE_CACHE_FOLDER;</span>
+<span class="nc" id="L63">        ZONE_ID = ZoneId.systemDefault();</span>
 
-<span class="nc" id="L64">    }</span>
+<span class="nc" id="L65">    }</span>
 
 
     /**
@@ -73,172 +74,226 @@ public class FighterParser implements SherdogParser&lt;Fighter&gt; {
      */
     @Override
     public Fighter parse(String url) throws IOException, ParseException {
-<span class="fc" id="L76">        Fighter fighter = new Fighter();</span>
-<span class="fc" id="L77">        fighter.setSherdogUrl(url);</span>
+<span class="fc" id="L77">        Fighter fighter = new Fighter();</span>
+<span class="fc" id="L78">        fighter.setSherdogUrl(url);</span>
 
-<span class="fc" id="L79">        logger.info(&quot;Refreshing fighter {}&quot;, fighter.getSherdogUrl());</span>
-<span class="fc" id="L80">        Document doc = Jsoup.connect(fighter.getSherdogUrl()).timeout(Constants.PARSING_TIMEOUT).get();</span>
+<span class="fc" id="L80">        logger.info(&quot;Refreshing fighter {}&quot;, fighter.getSherdogUrl());</span>
+<span class="fc" id="L81">        Document doc = Jsoup.connect(fighter.getSherdogUrl()).timeout(Constants.PARSING_TIMEOUT).get();</span>
 
         try {
-<span class="fc" id="L83">            Elements name = doc.select(&quot;h1[itemprop=\&quot;name\&quot;] span.fn&quot;);</span>
-<span class="fc" id="L84">            fighter.setName(name.get(0).html());</span>
-<span class="nc" id="L85">        } catch (Exception e) {</span>
+<span class="fc" id="L84">            Elements name = doc.select(&quot;h1[itemprop=\&quot;name\&quot;] span.fn&quot;);</span>
+<span class="fc" id="L85">            fighter.setName(name.get(0).html());</span>
+<span class="nc" id="L86">        } catch (Exception e) {</span>
             // no info, skipping
-<span class="fc" id="L87">        }</span>
+<span class="fc" id="L88">        }</span>
 
         // Getting nick name
         try {
-<span class="fc" id="L91">            Elements nickname = doc.select(&quot;h1[itemprop=\&quot;name\&quot;] span.nickname em&quot;);</span>
-<span class="fc" id="L92">            fighter.setNickname(nickname.get(0).html());</span>
-<span class="nc" id="L93">        } catch (Exception e) {</span>
+<span class="fc" id="L92">            Elements nickname = doc.select(&quot;h1[itemprop=\&quot;name\&quot;] span.nickname em&quot;);</span>
+<span class="fc" id="L93">            fighter.setNickname(nickname.get(0).html());</span>
+<span class="nc" id="L94">        } catch (Exception e) {</span>
             // no info, skipping
-<span class="fc" id="L95">        }</span>
+<span class="fc" id="L96">        }</span>
 
         // Birthday
         try {
-<span class="fc" id="L99">            Elements birthday = doc.select(&quot;span[itemprop=\&quot;birthDate\&quot;]&quot;);</span>
-<span class="fc" id="L100">            fighter.setBirthday(df.parse(birthday.get(0).html()));</span>
-<span class="nc" id="L101">        } catch (Exception e) {</span>
+<span class="fc" id="L100">            Elements birthday = doc.select(&quot;span[itemprop=\&quot;birthDate\&quot;]&quot;);</span>
+<span class="fc" id="L101">            fighter.setBirthday(df.parse(birthday.get(0).html()));</span>
+<span class="nc" id="L102">        } catch (Exception e) {</span>
             // no info, skipping
-<span class="fc" id="L103">        }</span>
+<span class="fc" id="L104">        }</span>
         // height
         try {
-<span class="fc" id="L106">            Elements height = doc.select(&quot;.size_info .height strong&quot;);</span>
-<span class="fc" id="L107">            fighter.setHeight(height.get(0).html());</span>
-<span class="nc" id="L108">        } catch (Exception e) {</span>
+<span class="fc" id="L107">            Elements height = doc.select(&quot;.size_info .height strong&quot;);</span>
+<span class="fc" id="L108">            fighter.setHeight(height.get(0).html());</span>
+<span class="nc" id="L109">        } catch (Exception e) {</span>
             // no info, skipping
-<span class="fc" id="L110">        }</span>
+<span class="fc" id="L111">        }</span>
         // weight
         try {
-<span class="fc" id="L113">            Elements weight = doc.select(&quot;.size_info .weight strong&quot;);</span>
-<span class="fc" id="L114">            fighter.setWeight(weight.get(0).html());</span>
-<span class="nc" id="L115">        } catch (Exception e) {</span>
+<span class="fc" id="L114">            Elements weight = doc.select(&quot;.size_info .weight strong&quot;);</span>
+<span class="fc" id="L115">            fighter.setWeight(weight.get(0).html());</span>
+<span class="nc" id="L116">        } catch (Exception e) {</span>
             // no info, skipping
-<span class="fc" id="L117">        }</span>
+<span class="fc" id="L118">        }</span>
         // wins
         try {
-<span class="fc" id="L120">            Elements wins = doc.select(&quot;.bio_graph .counter&quot;);</span>
-<span class="fc" id="L121">            fighter.setWins(Integer.parseInt(wins.get(0).html()));</span>
-<span class="nc" id="L122">        } catch (Exception e) {</span>
+<span class="fc" id="L121">            Elements wins = doc.select(&quot;.bio_graph .counter&quot;);</span>
+<span class="fc" id="L122">            fighter.setWins(Integer.parseInt(wins.get(0).html()));</span>
+<span class="nc" id="L123">        } catch (Exception e) {</span>
             // no info, skipping
-<span class="fc" id="L124">        }</span>
+<span class="fc" id="L125">        }</span>
         // wins
         try {
-<span class="fc" id="L127">            Elements losses = doc.select(&quot;.bio_graph.loser .counter&quot;);</span>
-<span class="fc" id="L128">            fighter.setLosses(Integer.parseInt(losses.get(0).html()));</span>
-<span class="nc" id="L129">        } catch (Exception e) {</span>
+<span class="fc" id="L128">            Elements losses = doc.select(&quot;.bio_graph.loser .counter&quot;);</span>
+<span class="fc" id="L129">            fighter.setLosses(Integer.parseInt(losses.get(0).html()));</span>
+<span class="nc" id="L130">        } catch (Exception e) {</span>
             // no info, skipping
-<span class="fc" id="L131">        }</span>
+<span class="fc" id="L132">        }</span>
         // draws and NC
-<span class="fc" id="L133">        Elements drawsNc = doc.select(&quot;.right_side .bio_graph .card&quot;);</span>
-<span class="pc bpc" id="L134" title="1 of 2 branches missed.">        for (Element element : drawsNc) {</span>
+<span class="fc" id="L134">        Elements drawsNc = doc.select(&quot;.right_side .bio_graph .card&quot;);</span>
+<span class="pc bpc" id="L135" title="1 of 2 branches missed.">        for (Element element : drawsNc) {</span>
 
-<span class="nc bnc" id="L136" title="All 10 branches missed.">            switch (element.select(&quot;span.result&quot;).html()) {</span>
+<span class="nc bnc" id="L137" title="All 10 branches missed.">            switch (element.select(&quot;span.result&quot;).html()) {</span>
                 case &quot;Draws&quot;:
-<span class="nc" id="L138">                    fighter.setDraws(Integer.parseInt(element.select(&quot;span.counter&quot;).html()));</span>
-<span class="nc" id="L139">                    break;</span>
+<span class="nc" id="L139">                    fighter.setDraws(Integer.parseInt(element.select(&quot;span.counter&quot;).html()));</span>
+<span class="nc" id="L140">                    break;</span>
 
                 case &quot;N/C&quot;:
-<span class="nc" id="L142">                    fighter.setNc(Integer.parseInt(element.select(&quot;span.counter&quot;).html()));</span>
+<span class="nc" id="L143">                    fighter.setNc(Integer.parseInt(element.select(&quot;span.counter&quot;).html()));</span>
                     break;
             }
 
-<span class="nc" id="L146">        }</span>
+<span class="nc" id="L147">        }</span>
 
-<span class="fc" id="L148">        Elements picture = doc.select(&quot;.bio_fighter .content img[itemprop=\&quot;image\&quot;]&quot;);</span>
-<span class="fc" id="L149">        String pictureUrl = picture.attr(&quot;src&quot;).trim();</span>
+<span class="fc" id="L149">        Elements picture = doc.select(&quot;.bio_fighter .content img[itemprop=\&quot;image\&quot;]&quot;);</span>
+<span class="fc" id="L150">        String pictureUrl = picture.attr(&quot;src&quot;).trim();</span>
 
-<span class="pc bpc" id="L151" title="1 of 2 branches missed.">        if (pictureUrl.length() &gt; 0) {</span>
+<span class="pc bpc" id="L152" title="1 of 2 branches missed.">        if (pictureUrl.length() &gt; 0) {</span>
 
-<span class="fc" id="L153">            String newPath = CACHE_FOLDER + hash(fighter.getSherdogUrl()) + &quot;.JPG&quot;;</span>
-<span class="fc" id="L154">            File f = new File(newPath);</span>
-<span class="fc" id="L155">            FileUtils.copyURLToFile(new URL(pictureUrl), f);</span>
-<span class="fc" id="L156">            fighter.setPicture(newPath);</span>
+<span class="fc" id="L154">            String newPath = CACHE_FOLDER + hash(fighter.getSherdogUrl()) + &quot;.JPG&quot;;</span>
+<span class="fc" id="L155">            File f = new File(newPath);</span>
+<span class="fc" id="L156">            FileUtils.copyURLToFile(new URL(pictureUrl), f);</span>
+<span class="fc" id="L157">            fighter.setPicture(newPath);</span>
         }
 
-<span class="fc" id="L159">        Elements fightTables = doc.select(&quot;.fight_history &quot;);</span>
-<span class="fc" id="L160">        logger.info(&quot;Found {} fight history tables&quot;, fightTables.size());</span>
+<span class="fc" id="L160">        Elements fightTables = doc.select(&quot;.fight_history &quot;);</span>
+<span class="fc" id="L161">        logger.info(&quot;Found {} fight history tables&quot;, fightTables.size());</span>
 
-<span class="fc" id="L162">        fightTables.stream()</span>
-<span class="fc" id="L163">                .filter(div -&gt; div.select(&quot;.module_header h2&quot;).html().trim().equalsIgnoreCase(&quot;FIGHT HISTORY - PRO&quot;))</span>
-<span class="fc" id="L164">                .map(div -&gt; div.select(&quot;.table table td&quot;))</span>
-<span class="pc bpc" id="L165" title="1 of 2 branches missed.">                .filter(tdList -&gt; tdList.size() &gt; 0)</span>
-<span class="fc" id="L166">                .findFirst()</span>
-<span class="fc" id="L167">                .ifPresent((tdList -&gt; fighter.setFights(getFights(tdList, fighter))));</span>
+<span class="fc" id="L163">        fightTables.stream()</span>
+<span class="fc" id="L164">                .filter(div -&gt; div.select(&quot;.module_header h2&quot;).html().trim().equalsIgnoreCase(&quot;FIGHT HISTORY - PRO&quot;))</span>
+<span class="fc" id="L165">                .map(div -&gt; div.select(&quot;.table table tr&quot;))</span>
+<span class="pc bpc" id="L166" title="1 of 2 branches missed.">                .filter(tdList -&gt; tdList.size() &gt; 0)</span>
+<span class="fc" id="L167">                .findFirst()</span>
+<span class="fc" id="L168">                .ifPresent((tdList -&gt; fighter.setFights(getFights(tdList, fighter))));</span>
 
         //fighter.getFights().sort((f1, f2) -&gt; f1.getDate().compareTo(f2.getDate()));
-<span class="fc" id="L170">        Collections.reverse(fighter.getFights());</span>
-<span class="fc" id="L171">        logger.info(&quot;Found {} fights for {}&quot;, fighter.getFights().size(), fighter.getName());</span>
-<span class="fc" id="L172">        return fighter;</span>
+<span class="fc" id="L171">        Collections.reverse(fighter.getFights());</span>
+<span class="fc" id="L172">        logger.info(&quot;Found {} fights for {}&quot;, fighter.getFights().size(), fighter.getName());</span>
+<span class="fc" id="L173">        return fighter;</span>
     }
 
 
     /**
      * Get a fighter fights
      *
-     * @param tds     JSOUP TDs document
+     * @param trs     JSOUP TRs document
      * @param fighter a fighter to parse against
      */
-    private List&lt;Fight&gt; getFights(Elements tds, Fighter fighter) throws ArrayIndexOutOfBoundsException {
-<span class="fc" id="L183">        List&lt;Fight&gt; fights = new ArrayList&lt;&gt;();</span>
+    private List&lt;Fight&gt; getFights(Elements trs, Fighter fighter) throws ArrayIndexOutOfBoundsException {
+<span class="fc" id="L184">        List&lt;Fight&gt; fights = new ArrayList&lt;&gt;();</span>
 
-<span class="fc" id="L185">        logger.info(&quot;{} TDs to parse through&quot;, tds.size());</span>
+<span class="fc" id="L186">        logger.info(&quot;{} TRs to parse through&quot;, trs.size());</span>
+
+
+<span class="fc" id="L189">        SherdogBaseObject sFighter = new SherdogBaseObject();</span>
+<span class="fc" id="L190">        sFighter.setName(fighter.getName());</span>
+<span class="fc" id="L191">        sFighter.setSherdogUrl(fighter.getSherdogUrl());</span>
+
+
         // removing header row...
-<span class="fc" id="L187">        tds.remove(0);</span>
-<span class="fc" id="L188">        tds.remove(0);</span>
-<span class="fc" id="L189">        tds.remove(0);</span>
-<span class="fc" id="L190">        tds.remove(0);</span>
-<span class="fc" id="L191">        tds.remove(0);</span>
-<span class="fc" id="L192">        tds.remove(0);</span>
+<span class="fc" id="L195">        trs.remove(0);</span>
 
-<span class="fc" id="L194">        Fight fight = new Fight();</span>
-<span class="fc" id="L195">        SherdogBaseObject sFighter = new SherdogBaseObject();</span>
-<span class="fc" id="L196">        sFighter.setName(fighter.getName());</span>
-<span class="fc" id="L197">        sFighter.setSherdogUrl(fighter.getSherdogUrl());</span>
-<span class="fc" id="L198">        fight.setFighter1(sFighter);</span>
+<span class="fc" id="L197">        trs.forEach(tr -&gt;{</span>
+<span class="fc" id="L198">            Fight fight = new Fight();</span>
+<span class="fc" id="L199">            fight.setFighter1(sFighter);</span>
 
-<span class="fc bfc" id="L200" title="All 2 branches covered.">        for (int i = 0; i &lt; tds.size(); i++) {</span>
-<span class="fc" id="L201">            Element td = tds.get(i);</span>
-<span class="pc bpc" id="L202" title="1 of 7 branches missed.">            switch (i % 6) {</span>
-                case COLUMN_RESULT:
-<span class="fc" id="L204">                    fight.setResult(ParserUtils.getFightResult(td));</span>
-<span class="fc" id="L205">                    break;</span>
-                case COLUMN_OPPONENT:
-<span class="fc" id="L207">                    SherdogBaseObject opponent = new SherdogBaseObject();</span>
-<span class="fc" id="L208">                    Element opponentLink = td.select(&quot;a&quot;).get(0);</span>
-<span class="fc" id="L209">                    opponent.setName(opponentLink.html());</span>
-<span class="fc" id="L210">                    opponent.setSherdogUrl(opponentLink.attr(&quot;abs:href&quot;));</span>
-<span class="fc" id="L211">                    fight.setFighter2(opponent);</span>
-<span class="fc" id="L212">                    break;</span>
-                case COLUMN_EVENT:
-<span class="fc" id="L214">                    Element link = td.select(&quot;a&quot;).get(0);</span>
+<span class="fc" id="L201">            Elements tds = tr.select(&quot;td&quot;);</span>
+<span class="fc" id="L202">            fight.setResult(getFightResult(tds.get(COLUMN_RESULT)));</span>
+<span class="fc" id="L203">            fight.setFighter2(getOpponent(tds.get(COLUMN_OPPONENT)));</span>
+<span class="fc" id="L204">            fight.setEvent(getEvent(tds.get(COLUMN_EVENT)));</span>
+<span class="fc" id="L205">            fight.setDate(getDate(tds.get(COLUMN_EVENT)));</span>
+<span class="fc" id="L206">            fight.setWinMethod(getWinMethod(tds.get(COLUMN_METHOD)));</span>
+<span class="fc" id="L207">            fight.setWinRound(getWinRound(tds.get(COLUMN_ROUND)));</span>
+<span class="fc" id="L208">            fight.setWinTime(getWinTime(tds.get(COLUMN_TIME)));</span>
+<span class="fc" id="L209">            fights.add(fight);</span>
+<span class="fc" id="L210">            logger.info(&quot;{}&quot;, fight);</span>
+<span class="fc" id="L211">        });</span>
 
-<span class="fc" id="L216">                    SherdogBaseObject event = new SherdogBaseObject();</span>
-<span class="fc" id="L217">                    event.setName(link.html().replaceAll(&quot;&lt;span itemprop=\&quot;award\&quot;&gt;|&lt;\\/span&gt;&quot;, &quot;&quot;));</span>
-<span class="fc" id="L218">                    event.setSherdogUrl(link.attr(&quot;abs:href&quot;));</span>
-                    //date
-<span class="fc" id="L220">                    Element date = td.select(&quot;span.sub_line&quot;).first();</span>
-<span class="fc" id="L221">                    fight.setDate(ParserUtils.getDateFromStringToZoneId(date.html(), ZONE_ID, DateTimeFormatter.ofPattern(&quot;MMM / dd / yyyy&quot;)));</span>
-<span class="fc" id="L222">                    fight.setEvent(event);</span>
-<span class="fc" id="L223">                    break;</span>
-                case COLUMN_METHOD:
-<span class="fc" id="L225">                    fight.setWinMethod(td.html().replaceAll(&quot;&lt;br&gt;(.*)&quot;, &quot;&quot;));</span>
-<span class="fc" id="L226">                    break;</span>
-                case COLUMN_ROUND:
-<span class="fc" id="L228">                    fight.setWinRound(Integer.parseInt(td.html()));</span>
-<span class="fc" id="L229">                    break;</span>
-                case COLUMN_TIME:
-<span class="fc" id="L231">                    fight.setWinTime(td.html());</span>
-                    //last column adding fight and resetting it;
-<span class="fc" id="L233">                    fights.add(fight);</span>
-<span class="fc" id="L234">                    logger.info(&quot;{}&quot;, fight);</span>
-<span class="fc" id="L235">                    fight = new Fight();</span>
-<span class="fc" id="L236">                    fight.setFighter1(sFighter);</span>
-                    break;
-            }
-        }
+<span class="fc" id="L213">        return fights;</span>
+    }
 
-<span class="fc" id="L241">        return fights;</span>
+
+    /**
+     * Get the fight result
+     * @param td a td from sherdogs table
+     * @return a fight result enum
+     */
+    private FightResult getFightResult(Element td){
+<span class="fc" id="L223">        return ParserUtils.getFightResult(td);</span>
+    }
+
+
+    /**
+     * Get the fight result
+     * @param td a td from sherdogs table
+     * @return a fight result enum
+     */
+    private SherdogBaseObject getOpponent(Element td){
+<span class="fc" id="L233">        SherdogBaseObject opponent = new SherdogBaseObject();</span>
+<span class="fc" id="L234">        Element opponentLink = td.select(&quot;a&quot;).get(0);</span>
+<span class="fc" id="L235">        opponent.setName(opponentLink.html());</span>
+<span class="fc" id="L236">        opponent.setSherdogUrl(opponentLink.attr(&quot;abs:href&quot;));</span>
+
+<span class="fc" id="L238">        return opponent;</span>
+    }
+
+
+    /**
+     * Get the fight event
+     * @param td a td from sherdogs table
+     * @return a sherdog base object with url and name
+     */
+    private SherdogBaseObject getEvent(Element td){
+<span class="fc" id="L248">        Element link = td.select(&quot;a&quot;).get(0);</span>
+
+<span class="fc" id="L250">        SherdogBaseObject event = new SherdogBaseObject();</span>
+<span class="fc" id="L251">        event.setName(link.html().replaceAll(&quot;&lt;span itemprop=\&quot;award\&quot;&gt;|&lt;\\/span&gt;&quot;, &quot;&quot;));</span>
+<span class="fc" id="L252">        event.setSherdogUrl(link.attr(&quot;abs:href&quot;));</span>
+
+
+<span class="fc" id="L255">        return event;</span>
+    }
+
+    /**
+     * Get the date of the fight
+     * @param td a td from sherdogs table
+     * @return the zonedatetime of the fight
+     */
+    private ZonedDateTime getDate(Element td){
+        //date
+<span class="fc" id="L265">        Element date = td.select(&quot;span.sub_line&quot;).first();</span>
+<span class="fc" id="L266">        return ParserUtils.getDateFromStringToZoneId(date.html(), ZONE_ID, DateTimeFormatter.ofPattern(&quot;MMM / dd / yyyy&quot;));</span>
+    }
+
+
+    /**
+     * Get the winning method
+     * @param td a td from sherdogs table
+     * @return a string with the finishing method
+     */
+    private String getWinMethod(Element td){
+<span class="fc" id="L276">        return td.html().replaceAll(&quot;&lt;br&gt;(.*)&quot;, &quot;&quot;);</span>
+    }
+
+
+    /**
+     * Get the winning round
+     * @param td a td from sherdogs table
+     * @return an itneger
+     */
+    private int getWinRound(Element td){
+<span class="fc" id="L286">       return Integer.parseInt(td.html());</span>
+    }
+
+
+    /**
+     * Get time of win
+     * @param td a td from sherdogs table
+     * @return the time of win
+     */
+    private String getWinTime(Element td){
+<span class="fc" id="L296">        return td.html();</span>
     }
 
     /**
@@ -247,8 +302,8 @@ public class FighterParser implements SherdogParser&lt;Fighter&gt; {
      * @param s the string to hash
      * @return the hashed string
      */
-    public static String hash(String s) {
-<span class="fc" id="L251">        return DigestUtils.sha256Hex(s);</span>
+    private String hash(String s) {
+<span class="fc" id="L306">        return DigestUtils.sha256Hex(s);</span>
     }
 }
 </pre><div class="footer"><span class="right">Created with <a href="http://www.eclemma.org/jacoco">JaCoCo</a> 0.7.7.201606060606</span></div></body></html>

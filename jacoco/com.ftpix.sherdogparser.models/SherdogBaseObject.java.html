@@ -1,30 +1,28 @@
 <?xml version="1.0" encoding="UTF-8"?><!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"><html xmlns="http://www.w3.org/1999/xhtml" lang="en"><head><meta http-equiv="Content-Type" content="text/html;charset=UTF-8"/><link rel="stylesheet" href="../jacoco-resources/report.css" type="text/css"/><link rel="shortcut icon" href="../jacoco-resources/report.gif" type="image/gif"/><title>SherdogBaseObject.java</title><link rel="stylesheet" href="../jacoco-resources/prettify.css" type="text/css"/><script type="text/javascript" src="../jacoco-resources/prettify.js"></script></head><body onload="window['PR_TAB_WIDTH']=4;prettyPrint()"><div class="breadcrumb" id="breadcrumb"><span class="info"><a href="../jacoco-sessions.html" class="el_session">Sessions</a></span><a href="../index.html" class="el_report">sherdog-parser</a> &gt; <a href="index.source.html" class="el_package">com.ftpix.sherdogparser.models</a> &gt; <span class="el_source">SherdogBaseObject.java</span></div><h1>SherdogBaseObject.java</h1><pre class="source lang-java linenums">package com.ftpix.sherdogparser.models;
 
-/**
- * Created by gz on 21-Aug-16.
- */
-<span class="fc" id="L6">public class SherdogBaseObject {</span>
-    protected String name, sherdogUrl;
+
+<span class="fc" id="L4">public class SherdogBaseObject {</span>
+    String name, sherdogUrl;
 
     public String getName() {
-<span class="fc" id="L10">        return name;</span>
+<span class="fc" id="L8">        return name;</span>
     }
 
     public void setName(String name) {
-<span class="fc" id="L14">        this.name = name;</span>
-<span class="fc" id="L15">    }</span>
+<span class="fc" id="L12">        this.name = name;</span>
+<span class="fc" id="L13">    }</span>
 
     public String getSherdogUrl() {
-<span class="fc" id="L18">        return sherdogUrl;</span>
+<span class="fc" id="L16">        return sherdogUrl;</span>
     }
 
     public void setSherdogUrl(String sherdogUrl) {
-<span class="fc" id="L22">        this.sherdogUrl = sherdogUrl;</span>
-<span class="fc" id="L23">    }</span>
+<span class="fc" id="L20">        this.sherdogUrl = sherdogUrl;</span>
+<span class="fc" id="L21">    }</span>
 
     @Override
     public String toString() {
-<span class="fc" id="L27">        return &quot;SherdogBaseObject{&quot; +</span>
+<span class="fc" id="L25">        return &quot;SherdogBaseObject{&quot; +</span>
                 &quot;name='&quot; + name + '\'' +
                 &quot;, sherdogUrl='&quot; + sherdogUrl + '\'' +
                 '}';

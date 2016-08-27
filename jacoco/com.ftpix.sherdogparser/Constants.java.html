@@ -5,16 +5,17 @@ import java.io.File;
 
 /**
  * Created by gz on 20-Aug-16.
+ * Default values forthe parsers
  */
-<span class="nc" id="L9">public class Constants {</span>
+<span class="nc" id="L10">public class Constants {</span>
     public final static String SHERDOG_TIME_ZONE = &quot;America/New_York&quot;;
     public final static int PARSING_TIMEOUT = 60000;
     public static final String FIGHTER_PICTURE_CACHE_FOLDER = &quot;cache/&quot;;
 
     static {
-<span class="nc" id="L15">        File f = new File(FIGHTER_PICTURE_CACHE_FOLDER);</span>
+<span class="nc" id="L16">        File f = new File(FIGHTER_PICTURE_CACHE_FOLDER);</span>
 
-<span class="nc bnc" id="L17" title="All 2 branches missed.">        if (f.exists()) f.mkdirs();</span>
-<span class="nc" id="L18">    }</span>
+<span class="nc bnc" id="L18" title="All 2 branches missed.">        if (f.exists()) f.mkdirs();</span>
+<span class="nc" id="L19">    }</span>
 }
 </pre><div class="footer"><span class="right">Created with <a href="http://www.eclemma.org/jacoco">JaCoCo</a> 0.7.7.201606060606</span></div></body></html>

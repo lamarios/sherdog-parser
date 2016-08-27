@@ -13,8 +13,9 @@ import java.time.format.DateTimeParseException;
 
 /**
  * Created by gz on 20-Aug-16.
+ * tools to help during parsing
  */
-<span class="nc" id="L17">public class ParserUtils {</span>
+<span class="nc" id="L18">class ParserUtils {</span>
     /**
      * Gets the result of a fight following sherdog website win/lose/draw/nc
      * Make sure to use on Fighter1 only
@@ -22,17 +23,17 @@ import java.time.format.DateTimeParseException;
      * @param element Jsoup element
      * @return a FightResult
      */
-    public static FightResult getFightResult(Element element) {
-<span class="fc bfc" id="L26" title="All 2 branches covered.">        if (element.select(&quot;.win&quot;).size() &gt; 0) {</span>
-<span class="fc" id="L27">            return FightResult.FIGHTER_1_WIN;</span>
-<span class="pc bpc" id="L28" title="1 of 2 branches missed.">        } else if (element.select(&quot;.loss&quot;).size() &gt; 0) {</span>
-<span class="fc" id="L29">            return FightResult.FIGHTER_2_WIN;</span>
-<span class="nc bnc" id="L30" title="All 2 branches missed.">        } else if (element.select(&quot;.draw&quot;).size() &gt; 0) {</span>
-<span class="nc" id="L31">            return FightResult.DRAW;</span>
-<span class="nc bnc" id="L32" title="All 2 branches missed.">        } else if (element.select(&quot;.nc&quot;).size() &gt; 0) {</span>
-<span class="nc" id="L33">            return FightResult.NO_CONTEST;</span>
+    static FightResult getFightResult(Element element) {
+<span class="fc bfc" id="L27" title="All 2 branches covered.">        if (element.select(&quot;.win&quot;).size() &gt; 0) {</span>
+<span class="fc" id="L28">            return FightResult.FIGHTER_1_WIN;</span>
+<span class="pc bpc" id="L29" title="1 of 2 branches missed.">        } else if (element.select(&quot;.loss&quot;).size() &gt; 0) {</span>
+<span class="fc" id="L30">            return FightResult.FIGHTER_2_WIN;</span>
+<span class="nc bnc" id="L31" title="All 2 branches missed.">        } else if (element.select(&quot;.draw&quot;).size() &gt; 0) {</span>
+<span class="nc" id="L32">            return FightResult.DRAW;</span>
+<span class="nc bnc" id="L33" title="All 2 branches missed.">        } else if (element.select(&quot;.nc&quot;).size() &gt; 0) {</span>
+<span class="nc" id="L34">            return FightResult.NO_CONTEST;</span>
         } else {
-<span class="nc" id="L35">            return FightResult.NOT_HAPPENED;</span>
+<span class="nc" id="L36">            return FightResult.NOT_HAPPENED;</span>
         }
     }
 
@@ -44,9 +45,9 @@ import java.time.format.DateTimeParseException;
      * @param zoneId Zone id to convert from sherdog's time
      * @return the  converted zonedatetime
      */
-    public static ZonedDateTime getDateFromStringToZoneId(String date, ZoneId zoneId) throws DateTimeParseException {
-<span class="fc" id="L48">        ZonedDateTime usDate = ZonedDateTime.parse(date).withZoneSameInstant(ZoneId.of(Constants.SHERDOG_TIME_ZONE));</span>
-<span class="fc" id="L49">        return usDate.withZoneSameInstant(zoneId);</span>
+    static ZonedDateTime getDateFromStringToZoneId(String date, ZoneId zoneId) throws DateTimeParseException {
+<span class="fc" id="L49">        ZonedDateTime usDate = ZonedDateTime.parse(date).withZoneSameInstant(ZoneId.of(Constants.SHERDOG_TIME_ZONE));</span>
+<span class="fc" id="L50">        return usDate.withZoneSameInstant(zoneId);</span>
     }
 
 
@@ -58,14 +59,14 @@ import java.time.format.DateTimeParseException;
      * @param formatter Formatter for exotic date format
      * @return the converted zonedatetime
      */
-    public static ZonedDateTime getDateFromStringToZoneId(String date, ZoneId zoneId, DateTimeFormatter formatter) throws DateTimeParseException {
+    static ZonedDateTime getDateFromStringToZoneId(String date, ZoneId zoneId, DateTimeFormatter formatter) throws DateTimeParseException {
         try {
-<span class="nc" id="L63">            ZonedDateTime usDate = ZonedDateTime.parse(date, formatter).withZoneSameInstant(ZoneId.of(Constants.SHERDOG_TIME_ZONE));</span>
-<span class="nc" id="L64">            return usDate.withZoneSameInstant(zoneId);</span>
-<span class="fc" id="L65">        } catch (Exception e) {</span>
+<span class="nc" id="L64">            ZonedDateTime usDate = ZonedDateTime.parse(date, formatter).withZoneSameInstant(ZoneId.of(Constants.SHERDOG_TIME_ZONE));</span>
+<span class="nc" id="L65">            return usDate.withZoneSameInstant(zoneId);</span>
+<span class="fc" id="L66">        } catch (Exception e) {</span>
             //In case the parsing fail, we try without time
-<span class="fc" id="L67">            ZonedDateTime usDate = LocalDate.parse(date, formatter).atStartOfDay(ZoneId.of(Constants.SHERDOG_TIME_ZONE));</span>
-<span class="fc" id="L68">            return usDate.withZoneSameInstant(zoneId);</span>
+<span class="fc" id="L68">            ZonedDateTime usDate = LocalDate.parse(date, formatter).atStartOfDay(ZoneId.of(Constants.SHERDOG_TIME_ZONE));</span>
+<span class="fc" id="L69">            return usDate.withZoneSameInstant(zoneId);</span>
         }
     }
 }
