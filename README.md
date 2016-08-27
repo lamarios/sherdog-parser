@@ -7,7 +7,7 @@ Sherdog Parser is Java library to parse through Sherdog and have get all the inf
 *Currently in process to get it to maven central*
 
 ## Usage
-
+[Java Documentation](https://lamarios.github.io/sherdog-parser/apidocs/)
 
 First created a Sherdog object with your own timezone and a cache folder where the fighter pictures will be downloaded
 ```Java
