@@ -7,7 +7,7 @@ import java.text.ParseException;
  * Created by gz on 20-Aug-16.
  * teh default interface for a shergod parser
  */
-interface SherdogParser<T> {
+public interface SherdogParser<T> {
 
     /**
      * Parse a sherdog page
@@ -17,5 +17,5 @@ interface SherdogParser<T> {
      * @throws IOException    if connecting to sherdog fails
      * @throws ParseException if the page structure has changed
      */
-    T parse(String url) throws IOException, ParseException;
+    public T parse(String url) throws IOException, ParseException;
 }
