@@ -1,0 +1,108 @@
+<?xml version="1.0" encoding="UTF-8"?><!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"><html xmlns="http://www.w3.org/1999/xhtml" lang="en"><head><meta http-equiv="Content-Type" content="text/html;charset=UTF-8"/><link rel="stylesheet" href="../jacoco-resources/report.css" type="text/css"/><link rel="shortcut icon" href="../jacoco-resources/report.gif" type="image/gif"/><title>Fight.java</title><link rel="stylesheet" href="../jacoco-resources/prettify.css" type="text/css"/><script type="text/javascript" src="../jacoco-resources/prettify.js"></script></head><body onload="window['PR_TAB_WIDTH']=4;prettyPrint()"><div class="breadcrumb" id="breadcrumb"><span class="info"><a href="../jacoco-sessions.html" class="el_session">Sessions</a></span><a href="../index.html" class="el_report">sherdog-parser</a> &gt; <a href="index.source.html" class="el_package">com.ftpix.sherdogparser.models</a> &gt; <span class="el_source">Fight.java</span></div><h1>Fight.java</h1><pre class="source lang-java linenums">package com.ftpix.sherdogparser.models;
+
+import java.time.ZonedDateTime;
+import java.util.Date;
+
+<span class="fc" id="L6">public class Fight {</span>
+    private SherdogBaseObject event;
+    private SherdogBaseObject fighter1;
+    private SherdogBaseObject fighter2;
+    private ZonedDateTime date;
+<span class="fc" id="L11">    private FightResult result = FightResult.NOT_HAPPENED;</span>
+    private String winMethod, winTime;
+    private int winRound;
+
+    public SherdogBaseObject getEvent() {
+<span class="fc" id="L16">        return event;</span>
+    }
+
+    public void setEvent(SherdogBaseObject event) {
+<span class="fc" id="L20">        this.event = event;</span>
+<span class="fc" id="L21">    }</span>
+
+    public SherdogBaseObject getFighter1() {
+<span class="fc" id="L24">        return fighter1;</span>
+    }
+
+    public void setFighter1(SherdogBaseObject fighter1) {
+<span class="fc" id="L28">        this.fighter1 = fighter1;</span>
+<span class="fc" id="L29">    }</span>
+
+    public SherdogBaseObject getFighter2() {
+<span class="fc" id="L32">        return fighter2;</span>
+    }
+
+    public void setFighter2(SherdogBaseObject fighter2) {
+<span class="fc" id="L36">        this.fighter2 = fighter2;</span>
+<span class="fc" id="L37">    }</span>
+
+    public ZonedDateTime getDate() {
+<span class="fc" id="L40">        return date;</span>
+    }
+
+    public void setDate(ZonedDateTime date) {
+<span class="fc" id="L44">        this.date = date;</span>
+<span class="fc" id="L45">    }</span>
+
+    public FightResult getResult() {
+<span class="fc" id="L48">        return result;</span>
+    }
+
+    public void setResult(FightResult result) {
+<span class="fc" id="L52">        this.result = result;</span>
+<span class="fc" id="L53">    }</span>
+
+    public String getWinMethod() {
+<span class="fc" id="L56">        return winMethod;</span>
+    }
+
+    public void setWinMethod(String winMethod) {
+<span class="fc" id="L60">        this.winMethod = winMethod;</span>
+<span class="fc" id="L61">    }</span>
+
+    public String getWinTime() {
+<span class="fc" id="L64">        return winTime;</span>
+    }
+
+    public void setWinTime(String winTime) {
+<span class="fc" id="L68">        this.winTime = winTime;</span>
+<span class="fc" id="L69">    }</span>
+
+    public int getWinRound() {
+<span class="fc" id="L72">        return winRound;</span>
+    }
+
+    public void setWinRound(int winRound) {
+<span class="fc" id="L76">        this.winRound = winRound;</span>
+<span class="fc" id="L77">    }</span>
+
+
+    public boolean equals(Object obj) {
+        try {
+<span class="nc" id="L82">            Fight fight = (Fight) obj;</span>
+
+<span class="nc bnc" id="L84" title="All 2 branches missed.">            boolean equals = fight.getFighter1().getSherdogUrl().equalsIgnoreCase(fighter1.getSherdogUrl())</span>
+<span class="nc bnc" id="L85" title="All 4 branches missed.">                    &amp;&amp; fight.getFighter2().getSherdogUrl().equalsIgnoreCase(fighter2.getSherdogUrl()) &amp;&amp; event.getSherdogUrl().equals(fight.getEvent().getSherdogUrl());</span>
+
+<span class="nc" id="L87">            return equals;</span>
+<span class="nc" id="L88">        } catch (Exception e) {</span>
+<span class="nc" id="L89">            return false;</span>
+        }
+    }
+
+
+    @Override
+    public String toString() {
+<span class="fc" id="L96">        return &quot;Fight{&quot; +</span>
+                &quot;event=&quot; + event +
+                &quot;, fighter1=&quot; + fighter1 +
+                &quot;, fighter2=&quot; + fighter2 +
+                &quot;, date=&quot; + date +
+                &quot;, result=&quot; + result +
+                &quot;, winMethod='&quot; + winMethod + '\'' +
+                &quot;, winTime='&quot; + winTime + '\'' +
+                &quot;, winRound=&quot; + winRound +
+                '}';
+    }
+}
+</pre><div class="footer"><span class="right">Created with <a href="http://www.eclemma.org/jacoco">JaCoCo</a> 0.7.7.201606060606</span></div></body></html>
