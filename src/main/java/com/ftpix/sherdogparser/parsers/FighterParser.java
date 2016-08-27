@@ -2,6 +2,7 @@ package com.ftpix.sherdogparser.parsers;
 
 import com.ftpix.sherdogparser.Constants;
 import com.ftpix.sherdogparser.models.Fight;
+import com.ftpix.sherdogparser.models.FightResult;
 import com.ftpix.sherdogparser.models.Fighter;
 import com.ftpix.sherdogparser.models.SherdogBaseObject;
 
@@ -21,6 +22,7 @@ import java.net.URL;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.time.ZoneId;
+import java.time.ZonedDateTime;
 import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
 import java.util.Collections;
@@ -161,7 +163,7 @@ public class FighterParser implements SherdogParser<Fighter> {
 
         fightTables.stream()
                 .filter(div -> div.select(".module_header h2").html().trim().equalsIgnoreCase("FIGHT HISTORY - PRO"))
-                .map(div -> div.select(".table table td"))
+                .map(div -> div.select(".table table tr"))
                 .filter(tdList -> tdList.size() > 0)
                 .findFirst()
                 .ifPresent((tdList -> fighter.setFights(getFights(tdList, fighter))));
@@ -176,69 +178,123 @@ public class FighterParser implements SherdogParser<Fighter> {
     /**
      * Get a fighter fights
      *
-     * @param tds     JSOUP TDs document
+     * @param trs     JSOUP TRs document
      * @param fighter a fighter to parse against
      */
-    private List<Fight> getFights(Elements tds, Fighter fighter) throws ArrayIndexOutOfBoundsException {
+    private List<Fight> getFights(Elements trs, Fighter fighter) throws ArrayIndexOutOfBoundsException {
         List<Fight> fights = new ArrayList<>();
 
-        logger.info("{} TDs to parse through", tds.size());
-        // removing header row...
-        tds.remove(0);
-        tds.remove(0);
-        tds.remove(0);
-        tds.remove(0);
-        tds.remove(0);
-        tds.remove(0);
+        logger.info("{} TRs to parse through", trs.size());
 
-        Fight fight = new Fight();
+
         SherdogBaseObject sFighter = new SherdogBaseObject();
         sFighter.setName(fighter.getName());
         sFighter.setSherdogUrl(fighter.getSherdogUrl());
-        fight.setFighter1(sFighter);
 
-        for (int i = 0; i < tds.size(); i++) {
-            Element td = tds.get(i);
-            switch (i % 6) {
-                case COLUMN_RESULT:
-                    fight.setResult(ParserUtils.getFightResult(td));
-                    break;
-                case COLUMN_OPPONENT:
-                    SherdogBaseObject opponent = new SherdogBaseObject();
-                    Element opponentLink = td.select("a").get(0);
-                    opponent.setName(opponentLink.html());
-                    opponent.setSherdogUrl(opponentLink.attr("abs:href"));
-                    fight.setFighter2(opponent);
-                    break;
-                case COLUMN_EVENT:
-                    Element link = td.select("a").get(0);
 
-                    SherdogBaseObject event = new SherdogBaseObject();
-                    event.setName(link.html().replaceAll("<span itemprop=\"award\">|<\\/span>", ""));
-                    event.setSherdogUrl(link.attr("abs:href"));
-                    //date
-                    Element date = td.select("span.sub_line").first();
-                    fight.setDate(ParserUtils.getDateFromStringToZoneId(date.html(), ZONE_ID, DateTimeFormatter.ofPattern("MMM / dd / yyyy")));
-                    fight.setEvent(event);
-                    break;
-                case COLUMN_METHOD:
-                    fight.setWinMethod(td.html().replaceAll("<br>(.*)", ""));
-                    break;
-                case COLUMN_ROUND:
-                    fight.setWinRound(Integer.parseInt(td.html()));
-                    break;
-                case COLUMN_TIME:
-                    fight.setWinTime(td.html());
-                    //last column adding fight and resetting it;
-                    fights.add(fight);
-                    logger.info("{}", fight);
-                    fight = new Fight();
-                    fight.setFighter1(sFighter);
-                    break;
-            }
-        }
+        // removing header row...
+        trs.remove(0);
+
+        trs.forEach(tr ->{
+            Fight fight = new Fight();
+            fight.setFighter1(sFighter);
+
+            Elements tds = tr.select("td");
+            fight.setResult(getFightResult(tds.get(COLUMN_RESULT)));
+            fight.setFighter2(getOpponent(tds.get(COLUMN_OPPONENT)));
+            fight.setEvent(getEvent(tds.get(COLUMN_EVENT)));
+            fight.setDate(getDate(tds.get(COLUMN_EVENT)));
+            fight.setWinMethod(getWinMethod(tds.get(COLUMN_METHOD)));
+            fight.setWinRound(getWinRound(tds.get(COLUMN_ROUND)));
+            fight.setWinTime(getWinTime(tds.get(COLUMN_TIME)));
+            fights.add(fight);
+            logger.info("{}", fight);
+        });
 
         return fights;
+    }
+
+
+    /**
+     * Get the fight result
+     * @param td a td from sherdogs table
+     * @return a fight result enum
+     */
+    private FightResult getFightResult(Element td){
+        return ParserUtils.getFightResult(td);
+    }
+
+
+    /**
+     * Get the fight result
+     * @param td a td from sherdogs table
+     * @return a fight result enum
+     */
+    private SherdogBaseObject getOpponent(Element td){
+        SherdogBaseObject opponent = new SherdogBaseObject();
+        Element opponentLink = td.select("a").get(0);
+        opponent.setName(opponentLink.html());
+        opponent.setSherdogUrl(opponentLink.attr("abs:href"));
+
+        return opponent;
+    }
+
+
+    /**
+     * Get the fight event
+     * @param td a td from sherdogs table
+     * @return a sherdog base object with url and name
+     */
+    private SherdogBaseObject getEvent(Element td){
+        Element link = td.select("a").get(0);
+
+        SherdogBaseObject event = new SherdogBaseObject();
+        event.setName(link.html().replaceAll("<span itemprop=\"award\">|<\\/span>", ""));
+        event.setSherdogUrl(link.attr("abs:href"));
+
+
+        return event;
+    }
+
+    /**
+     * Get the date of the fight
+     * @param td a td from sherdogs table
+     * @return the zonedatetime of the fight
+     */
+    private ZonedDateTime getDate(Element td){
+        //date
+        Element date = td.select("span.sub_line").first();
+        return ParserUtils.getDateFromStringToZoneId(date.html(), ZONE_ID, DateTimeFormatter.ofPattern("MMM / dd / yyyy"));
+    }
+
+
+    /**
+     * Get the winning method
+     * @param td a td from sherdogs table
+     * @return a string with the finishing method
+     */
+    private String getWinMethod(Element td){
+        return td.html().replaceAll("<br>(.*)", "");
+    }
+
+
+    /**
+     * Get the winning round
+     * @param td a td from sherdogs table
+     * @return an itneger
+     */
+    private int getWinRound(Element td){
+       return Integer.parseInt(td.html());
+    }
+
+
+    /**
+     * Get time of win
+     * @param td a td from sherdogs table
+     * @return the time of win
+     */
+    private String getWinTime(Element td){
+        return td.html();
     }
 
     /**

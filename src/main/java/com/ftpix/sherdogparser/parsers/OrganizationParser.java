@@ -31,7 +31,7 @@ import java.util.TimeZone;
 public class OrganizationParser implements SherdogParser<Organization> {
     private final Logger logger = LoggerFactory.getLogger(OrganizationParser.class);
 
-    private final int DATE_COLUMN = 1, NAME_COLUMN = 2, LOCATION_COLUMN = 3;
+    private final int DATE_COLUMN = 0, NAME_COLUMN = 1, LOCATION_COLUMN = 2;
     private final DateTimeFormatter df = DateTimeFormatter.ofPattern("yyyy-MM-dd' 'HH:mm:ss");
     //private final SimpleDateFormat df2 = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
 
@@ -75,7 +75,7 @@ public class OrganizationParser implements SherdogParser<Organization> {
 
 
         logger.info("Getting upcoming event");
-        Elements upcomingEventsElement = doc.select("#upcoming_tab .event td");
+        Elements upcomingEventsElement = doc.select("#upcoming_tab .event tr");
         organization.getEvents().addAll(parseEvent(upcomingEventsElement));
 
         logger.info("Getting past events");
@@ -85,7 +85,7 @@ public class OrganizationParser implements SherdogParser<Organization> {
 
             toAdd = new ArrayList<>();
             doc = Jsoup.connect(url + page).timeout(Constants.PARSING_TIMEOUT).get();
-            Elements events = doc.select("#recent_tab .event td");
+            Elements events = doc.select("#recent_tab .event tr");
 
             toAdd = parseEvent(events);
 
@@ -104,76 +104,64 @@ public class OrganizationParser implements SherdogParser<Organization> {
     /**
      * Get all the events of an organization
      *
-     * @param td the JSOUP TD elements from the event table
+     * @param trs the JSOUP TR elements from the event table
      * @return a list of events
      * @throws ParseException if something is wrong with sherdog layout
      */
-    private List<Event> parseEvent(Elements td) throws ParseException {
+    private List<Event> parseEvent(Elements trs) throws ParseException {
         List<Event> events = new ArrayList<Event>();
 
-        int i = 1;
-        td.remove(0);
-        td.remove(0);
-        td.remove(0);
-        Event event = new Event();
-        boolean addEvent = true;
-        for (Element element : td) {
-            switch (i) {
-                case DATE_COLUMN:
-                    Elements metaDate = element.select("meta[itemprop=\"startDate\"");
-                    String date = metaDate.get(0).attr("content");
-                    // Date eventDate = df.parse(date);
+        trs.remove(0);
 
-                    //OffsetDateTime odt = OffsetDateTime.parse( date );
-                    //ZonedDateTime usDate = odt.atZoneSameInstant(ZoneId.of(Constants.SHERDOG_TIME_ZONE));
+        trs.forEach(tr -> {
 
-                    // ZonedDateTime usDate = ZonedDateTime.ofInstant(eventDate.toInstant(), );
-                    //System.out.println(usDate);
-                    // event.setDate(usDate);
-                    try {
-                        event.setDate(ParserUtils.getDateFromStringToZoneId(date, ZONE_ID));
-                    } catch (DateTimeParseException e) {
-                        logger.error("Couldn't fornat date, we shouldn't add the event", e);
-                        addEvent = false;
-                    }
-                    break;
-                case NAME_COLUMN:
-                    Elements name = element.select("span[itemprop=\"name\"");
-                    event.setName(name.get(0).html());
+            Event event = new Event();
+            boolean addEvent = true;
+            Elements tds = tr.select("td");
 
 
-                    event.setName(event.getName().replaceAll("( )+", " "));
-                    event.setName(event.getName().trim());
-                    Elements url = element.select("a[itemprop=\"url\"");
-                    event.setSherdogUrl(url.get(0).attr("abs:href"));
-                    break;
-                case LOCATION_COLUMN:
-                    String[] split = element.html().split(">");
-                    event.setLocation(split[1].trim());
-                    break;
-                default:
-                    break;
+            event.setName(getEventName(tds.get(NAME_COLUMN)));
+            event.setSherdogUrl(getEventUrl(tds.get(NAME_COLUMN)));
+            event.setLocation(getElementLocation(tds.get(LOCATION_COLUMN)));
+
+            try {
+                event.setDate(getEventDate(tds.get(DATE_COLUMN)));
+            } catch (DateTimeParseException e) {
+                logger.error("Couldn't fornat date, we shouldn't add the event", e);
+                addEvent = false;
             }
-            i++;
-            if (i == 4) {
-                // event.setOrganization(organization);
 
-                // Date local = DateUtils.convertTimeZone(event.getDate(),
-                // TimeZone.getTimeZone(Constants.SHERDOG_TIME_ZONE),
-                // TimeZone.getDefault());
-                // logger.info("Event date: Sherdog:{}, local:{}",
-                // event.getDate(), local);
-
-                if (addEvent) {
-                    logger.info("Adding event {}", event.getName());
-                    events.add(event);
-                }
-                event = new Event();
-                i = 1;
+            if (addEvent) {
+                events.add(event);
             }
-            // logger.info(element.html());
-        }
+        });
+
 
         return events;
+    }
+
+    private String getElementLocation(Element td) {
+        String[] split = td.html().split(">");
+        return split[1].trim();
+    }
+
+    private String getEventName(Element td) {
+        Elements nameElement = td.select("span[itemprop=\"name\"");
+        String name = nameElement.get(0).html();
+        name = name.replaceAll("( )+", " ").trim();
+
+        return name;
+    }
+
+    private String getEventUrl(Element td) {
+        Elements url = td.select("a[itemprop=\"url\"");
+        return url.get(0).attr("abs:href");
+    }
+
+    private ZonedDateTime getEventDate(Element element) {
+        Elements metaDate = element.select("meta[itemprop=\"startDate\"");
+        String date = metaDate.get(0).attr("content");
+
+        return ParserUtils.getDateFromStringToZoneId(date, ZONE_ID);
     }
 }

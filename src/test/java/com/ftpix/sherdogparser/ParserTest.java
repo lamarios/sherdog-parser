@@ -59,9 +59,9 @@ public class ParserTest {
     @Test
     public void testEventParser() throws IOException, ParseException {
 //
-        // Event test = new EventParser(ZoneId.of("Asia/Kuala_Lumpur")).parse("http://www.sherdog.com/events/UFC-Mexico-City-51653");
-        //System.out.println(test);
-        //test.getFights().forEach(System.out::println);
+//        Event test = new EventParser(ZoneId.of("Asia/Kuala_Lumpur")).parse("http://www.sherdog.com/events/UFC-Mexico-City-51653");
+//        System.out.println(test);
+//        test.getFights().forEach(System.out::println);
 
 
         //System.out.println(gson.toJson(test));

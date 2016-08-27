@@ -3,6 +3,7 @@ package com.ftpix.sherdogparser.parsers;
 import com.ftpix.sherdogparser.Constants;
 import com.ftpix.sherdogparser.models.Event;
 import com.ftpix.sherdogparser.models.Fight;
+import com.ftpix.sherdogparser.models.FightResult;
 import com.ftpix.sherdogparser.models.SherdogBaseObject;
 
 import org.jsoup.Jsoup;
@@ -25,7 +26,7 @@ import java.util.List;
  * Created by gz on 20-Aug-16.
  */
 public class EventParser implements SherdogParser<Event> {
-    private final int FIGHTER1_COLUMN = 2, FIGHTER2_COLUMN = 4, METHOD_COLUMN = 5, ROUND_COLUMN = 6, TIME_COLUMN = 0;
+    private final int FIGHTER1_COLUMN = 1, FIGHTER2_COLUMN = 3, METHOD_COLUMN = 4, ROUND_COLUMN = 5, TIME_COLUMN = 6;
     private final Logger logger = LoggerFactory.getLogger(EventParser.class);
 
     private final ZoneId ZONE_ID;
@@ -105,7 +106,6 @@ public class EventParser implements SherdogParser<Event> {
         //First fighter
         SherdogBaseObject mainFighter1 = new SherdogBaseObject();
         Element mainFighter1Element = fighters.get(0);
-
         mainFighter1.setSherdogUrl(mainFighter1Element.attr("abs:href"));
         mainFighter1.setName(mainFighter1Element.select("span[itemprop=\"name\"]").html());
 
@@ -138,86 +138,20 @@ public class EventParser implements SherdogParser<Event> {
 
         logger.info("Found {} fights", fights.size());
 
-        try {
-            Elements tds = doc.select(".event_match table td");
+        Elements tds = doc.select(".event_match table tr");
 
-            fights.addAll(parseOldEventFights(tds, event));
-        } catch (IndexOutOfBoundsException e) {
-            Elements tds = doc.select(".event_match table td");
+        fights.addAll(parseEventFights(tds, event));
 
-            fights.addAll(parseFutureEventFights(tds, event));
-        }
 
         event.setFights(fights);
     }
 
 
-    /**
-     * Parse new events
-     */
-    private Collection<? extends Fight> parseFutureEventFights(Elements tds, Event event) {
-        SherdogBaseObject sEvent = new SherdogBaseObject();
-        sEvent.setName(event.getName());
-        sEvent.setSherdogUrl(event.getSherdogUrl());
-
-        List<Fight> fights = new ArrayList<Fight>();
-
-        int i = 1;
-
-        Fight fight = new Fight();
-
-        tds.remove(0);
-        tds.remove(0);
-
-        for (Element td : tds) {
-
-            String name, url;
-            SherdogBaseObject fighter = new SherdogBaseObject();
-            switch (i % 4) {
-
-                case 2:
-                    Elements name1 = td.select("span[itemprop=\"name\"]");
-                    name = name1.get(0).html();
-                    url = td.select("a[itemprop=\"url\"]").get(0).attr("abs:href");
-
-                    fighter.setSherdogUrl(url);
-                    fighter.setName(name);
-
-                    fight.setFighter1(fighter);
-                    break;
-                case 0:
-                    Elements name2 = td.select("span[itemprop=\"name\"]");
-
-                    name = name2.get(0).html();
-                    url = td.select("a[itemprop=\"url\"]").get(0).attr("abs:href");
-
-                    fighter.setSherdogUrl(url);
-                    fighter.setName(name);
-                    fight.setFighter2(fighter);
-
-
-                    fight.setEvent(sEvent);
-                    fight.setDate(event.getDate());
-                    fights.add(fight);
-                    logger.info("Fight added: {}", fight);
-
-                    fight = new Fight();
-                    break;
-                default:
-                    break;
-            }
-            i++;
-
-        }
-
-        return fights;
-    }
-
 
     /**
      * Parse fights of an old event
      */
-    private List<Fight> parseOldEventFights(Elements tds, Event event) {
+    private List<Fight> parseEventFights(Elements trs, Event event) {
         SherdogBaseObject sEvent = new SherdogBaseObject();
         sEvent.setName(event.getName());
         sEvent.setSherdogUrl(event.getSherdogUrl());
@@ -226,66 +160,85 @@ public class EventParser implements SherdogParser<Event> {
 
         int i = 1;
 
-        Fight fight = new Fight();
+        trs.remove(0);
 
-        tds.remove(0);
-        tds.remove(0);
-        tds.remove(0);
-        tds.remove(0);
-        tds.remove(0);
+        trs.forEach(tr -> {
+            Fight fight = new Fight();
+            fight.setEvent(sEvent);
+            fight.setDate(event.getDate());
+            Elements tds = tr.select("td");
 
-        for (Element td : tds) {
+            fight.setFighter1(getFighter(tds.get(FIGHTER1_COLUMN)));
+            fight.setFighter2(getFighter(tds.get(FIGHTER2_COLUMN)));
 
-            String name, url;
-            SherdogBaseObject fighter = new SherdogBaseObject();
-
-            switch (i % 7) {
-
-                case FIGHTER1_COLUMN:
-                    Elements name1 = td.select("span[itemprop=\"name\"]");
-                    name = name1.get(0).html();
-                    url = td.select("a[itemprop=\"url\"]").get(0).attr("abs:href");
-
-                    fighter.setSherdogUrl(url);
-                    fighter.setName(name);
-
-                    fight.setFighter1(fighter);
-                    fight.setResult(ParserUtils.getFightResult(td));
-                    break;
-                case FIGHTER2_COLUMN:
-                    Elements name2 = td.select("span[itemprop=\"name\"]");
-
-                    name = name2.get(0).html();
-                    url = td.select("a[itemprop=\"url\"]").get(0).attr("abs:href");
-
-                    fighter.setSherdogUrl(url);
-                    fighter.setName(name);
-                    fight.setFighter2(fighter);
-                    break;
-                case METHOD_COLUMN:
-                    fight.setWinMethod(td.html().replaceAll("<br>(.*)", ""));
-                    break;
-                case ROUND_COLUMN:
-                    fight.setWinRound(Integer.parseInt(td.html()));
-                    break;
-                case TIME_COLUMN:
-                    fight.setWinTime(td.html());
-
-                    fight.setEvent(sEvent);
-                    fight.setDate(event.getDate());
-                    fights.add(fight);
-                    logger.info("Fight added: {}", fight);
-
-                    fight = new Fight();
-                    break;
-                default:
-                    break;
+            //parsing old fight, we can get the result
+            if (tds.size() == 7) {
+                fight.setResult(getResult(tds.get(FIGHTER1_COLUMN)));
+                fight.setWinMethod(getMethod(tds.get(METHOD_COLUMN)));
+                fight.setWinRound(getRound(tds.get(ROUND_COLUMN)));
+                fight.setWinTime(getTime(tds.get(TIME_COLUMN)));
             }
-            i++;
 
-        }
+            fights.add(fight);
+            logger.info("Fight added: {}", fight);
+        });
 
         return fights;
-
     }
+
+    /**
+     * Get a fighter
+     * @param td element from sherdog's table
+     * @return
+     */
+    private SherdogBaseObject getFighter(Element td) {
+
+        Elements name1 = td.select("span[itemprop=\"name\"]");
+        String name = name1.get(0).html();
+        String url = td.select("a[itemprop=\"url\"]").get(0).attr("abs:href");
+
+        SherdogBaseObject fighter = new SherdogBaseObject();
+        fighter.setSherdogUrl(url);
+        fighter.setName(name);
+        return fighter;
+    }
+
+    /**
+     * get the time at which teh fight finished
+     * @param td element from sherdog's table
+     * @return
+     */
+    private String getTime(Element td) {
+        return td.html();
+    }
+
+
+    /**
+     * get the round at which the even finished
+     * @param td element from sherdog's table
+     * @return the round number
+     */
+    private int getRound(Element td) {
+        return Integer.parseInt(td.html());
+    }
+
+
+    /**
+     *
+     * @param td element from sherdog's table
+     * @return
+     */
+    private String getMethod(Element td) {
+        return td.html().replaceAll("<br>(.*)", "");
+    }
+
+    /**
+     *  get the result of the fight
+     * @param td element from sherdog's table
+     * @return a rightresult enum
+     */
+    private FightResult getResult(Element td) {
+        return ParserUtils.getFightResult(td);
+    }
+
 }
