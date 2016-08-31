@@ -18,7 +18,7 @@ Sherdog parser = new Sherdog.Builder().withCacheFolder("/mnt/media/fighter-pictu
 
 To get all the events of an organization
 ```Java
-Organization ufc = parser.getOrganization(Organizations.UFC.url);
+Organization ufc = parser.getOrganization(Organizations.UFC);
 ```
 Some organizations are already preset under the enum **Organizations** or you can just put the URL of the organization from Sherdog website
 
