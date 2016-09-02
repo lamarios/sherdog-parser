@@ -4,7 +4,14 @@ Sherdog Parser is Java library to parse through Sherdog and have get all the inf
 
 ## Download
 
-*Currently in process to get it to maven central*
+```xml
+<!-- https://mvnrepository.com/artifact/com.ftpix/sherdog-parser -->
+<dependency>
+    <groupId>com.ftpix</groupId>
+    <artifactId>sherdog-parser</artifactId>
+    <version>1.0</version>
+</dependency>
+```
 
 ## Usage
 [Java Documentation](https://lamarios.github.io/sherdog-parser/apidocs/)
