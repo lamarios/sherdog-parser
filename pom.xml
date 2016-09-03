@@ -6,7 +6,7 @@
 
     <groupId>com.ftpix.</groupId>
     <artifactId>sherdog-parser</artifactId>
-    <version>1.0</version>
+    <version>1.1</version>
     <packaging>jar</packaging>
 
     <name>${groupId}:${artifactId}</name>
@@ -17,6 +17,7 @@
         <maven.compiler.source>1.8</maven.compiler.source>
         <maven.compiler.target>1.8</maven.compiler.target>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
+        <skip.publish.process>true</skip.publish.process>
     </properties>
 
     <licenses>
@@ -153,6 +154,9 @@
                         </goals>
                     </execution>
                 </executions>
+                <configuration>
+                    <skip>${skip.publish.process}</skip>
+                </configuration>
             </plugin>
 
 
@@ -168,6 +172,9 @@
                         </goals>
                     </execution>
                 </executions>
+                <configuration>
+                    <skipSource>${skip.publish.process}</skipSource>
+                </configuration>
             </plugin>
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
@@ -181,6 +188,9 @@
                         </goals>
                     </execution>
                 </executions>
+                <configuration>
+                    <skip>${skip.publish.process}</skip>
+                </configuration>
             </plugin>
 
             <plugin>
@@ -189,6 +199,7 @@
                 <version>1.6.7</version>
                 <extensions>true</extensions>
                 <configuration>
+                    <skipStaging>${skip.publish.process}</skipStaging>
                     <serverId>ossrh</serverId>
                     <nexusUrl>https://oss.sonatype.org/</nexusUrl>
                     <autoReleaseAfterClose>true</autoReleaseAfterClose>
@@ -198,4 +209,13 @@
 
         </plugins>
     </build>
+
+    <profiles>
+        <profile>
+            <id>dist</id>
+            <properties>
+                <skip.publish.process>false</skip.publish.process>
+            </properties>
+        </profile>
+    </profiles>
 </project>
