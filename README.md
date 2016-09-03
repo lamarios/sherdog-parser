@@ -9,7 +9,7 @@ Sherdog Parser is Java library to parse through Sherdog and have get all the inf
 <dependency>
     <groupId>com.ftpix</groupId>
     <artifactId>sherdog-parser</artifactId>
-    <version>1.0</version>
+    <version>1.1</version>
 </dependency>
 ```
 
