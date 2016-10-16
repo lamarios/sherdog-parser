@@ -164,8 +164,8 @@ public class ParserTest {
         //fighter.getFights().forEach(System.out::println);
 
         assertEquals(FightResult.FIGHTER_2_WIN, fight.getResult());
-        assertEquals("http://www.sherdog.com/fighter/Baga-Agaev-11793", fight.getFighter2().getSherdogUrl());
-        assertEquals("Baga Agaev", fight.getFighter2().getName());
+        assertEquals("http://www.sherdog.com/fighter/Magomedbag-Agaev-11793", fight.getFighter2().getSherdogUrl());
+        assertEquals("Magomedbag Agaev", fight.getFighter2().getName());
         assertEquals("Submission (Armbar)", fight.getWinMethod());
         assertEquals(1, fight.getWinRound());
         assertEquals("4:05", fight.getWinTime());
