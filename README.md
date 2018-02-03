@@ -9,7 +9,7 @@ Sherdog Parser is Java library to parse through Sherdog and have get all the inf
 <dependency>
     <groupId>com.ftpix</groupId>
     <artifactId>sherdog-parser</artifactId>
-    <version>1.1</version>
+    <version>1.3</version>
 </dependency>
 ```
 
@@ -18,9 +18,9 @@ Sherdog Parser is Java library to parse through Sherdog and have get all the inf
 
 
 
-First created a Sherdog object with your own timezone and a cache folder where the fighter pictures will be downloaded
+First created a Sherdog object.
 ```Java
-Sherdog parser = new Sherdog.Builder().withCacheFolder("/mnt/media/fighter-pictures/cache").withTimezone("Asia/Kuala_Lumpur").build();
+Sherdog parser = new Sherdog.Builder().build();
 ```
 
 To get all the events of an organization
@@ -46,3 +46,19 @@ You can get more details about a fighter with his Sherdog url.
 ```Java
 Fighter fighter = parser.getFighter(firstFight.getFighter1().getSherdogUrl());
 ```
+
+
+By default the fighter picture  value will be set to the sherdog picture URL. If you wish to do something else with it you can set a picture processor to your parser.
+Example on how to download the picture to a temp file and set it as the fighter picture value.
+
+The processor takes two parameters, the url (String) and the fighter (Fighter)
+
+```java
+Sherdog parser = new Sherdog.Builder().withPictureProcessor((url, fighter) -> {
+            final Path tempFile = Files.createTempFile(fighter.getName(), "");
+            FileUtils.copyURLToFile(new URL(url), tempFile.toFile());
+
+            return tempFile.toAbsolutePath().toString();
+        }).build();
+```
+

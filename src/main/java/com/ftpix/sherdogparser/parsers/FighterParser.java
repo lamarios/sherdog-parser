@@ -1,6 +1,7 @@
 package com.ftpix.sherdogparser.parsers;
 
 import com.ftpix.sherdogparser.Constants;
+import com.ftpix.sherdogparser.PictureProcessor;
 import com.ftpix.sherdogparser.models.Fight;
 import com.ftpix.sherdogparser.models.FightResult;
 import com.ftpix.sherdogparser.models.Fighter;
@@ -35,31 +36,32 @@ public class FighterParser implements SherdogParser<Fighter> {
     private final Logger logger = LoggerFactory.getLogger(FighterParser.class);
     private final SimpleDateFormat df = new SimpleDateFormat("yyyy-dd-MM");
 
-    private final String CACHE_FOLDER;
+    private final PictureProcessor PROCESSOR;
     private final ZoneId ZONE_ID;
     private final int COLUMN_RESULT = 0, COLUMN_OPPONENT = 1, COLUMN_EVENT = 2, COLUMN_METHOD = 3, COLUMN_ROUND = 4, COLUMN_TIME = 5;
 
     /**
      * Create a fight parser with a specified cache folder
      */
-    public FighterParser(String cacheFolder) {
-        this.CACHE_FOLDER = cacheFolder;
+    public FighterParser(PictureProcessor processor) {
+        this.PROCESSOR = processor;
         ZONE_ID = ZoneId.systemDefault();
     }
 
     /**
      * Generates a fight parser with specified cache folder and zone id
      */
-    public FighterParser(String cacheFolder, ZoneId zoneId) {
-        this.CACHE_FOLDER = cacheFolder;
+    public FighterParser(PictureProcessor processor, ZoneId zoneId) {
+        this.PROCESSOR = processor;
         this.ZONE_ID = zoneId;
     }
 
     /**
      * FighterPArser with default cache folder location
+     * @param zoneId
      */
-    public FighterParser() {
-        this.CACHE_FOLDER = Constants.FIGHTER_PICTURE_CACHE_FOLDER;
+    public FighterParser(ZoneId zoneId) {
+        this.PROCESSOR = Constants.DEFAULT_PICTURE_PROCESSOR;
         ZONE_ID = ZoneId.systemDefault();
 
     }
@@ -149,13 +151,6 @@ public class FighterParser implements SherdogParser<Fighter> {
         Elements picture = doc.select(".bio_fighter .content img[itemprop=\"image\"]");
         String pictureUrl = picture.attr("src").trim();
 
-        if (pictureUrl.length() > 0) {
-
-            String newPath = CACHE_FOLDER + hash(fighter.getSherdogUrl()) + ".JPG";
-            File f = new File(newPath);
-            FileUtils.copyURLToFile(new URL(pictureUrl), f);
-            fighter.setPicture(newPath);
-        }
 
         Elements fightTables = doc.select(".fight_history ");
         logger.info("Found {} fight history tables", fightTables.size());
@@ -170,6 +165,12 @@ public class FighterParser implements SherdogParser<Fighter> {
         //fighter.getFights().sort((f1, f2) -> f1.getDate().compareTo(f2.getDate()));
         Collections.reverse(fighter.getFights());
         logger.info("Found {} fights for {}", fighter.getFights().size(), fighter.getName());
+
+        //setting the picture last to make sure the fighter variable has all the data
+        if (pictureUrl.length() > 0) {
+            fighter.setPicture(PROCESSOR.process(pictureUrl, fighter));
+        }
+
         return fighter;
     }
 

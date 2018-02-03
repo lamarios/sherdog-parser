@@ -9,12 +9,16 @@ import com.ftpix.sherdogparser.models.Fighter;
 import com.ftpix.sherdogparser.models.Organization;
 import com.ftpix.sherdogparser.models.Organizations;
 
+import org.apache.commons.io.FileUtils;
 import org.junit.BeforeClass;
 import org.junit.Test;
 
 import java.io.File;
 import java.io.IOException;
 import java.lang.reflect.Modifier;
+import java.net.URL;
+import java.nio.file.Files;
+import java.nio.file.Path;
 import java.text.ParseException;
 
 import io.gsonfire.GsonFireBuilder;
@@ -30,8 +34,8 @@ public class ParserTest {
     private static Sherdog sherdog;
 
     @BeforeClass
-    public static void setup(){
-        sherdog = new Sherdog.Builder().withCacheFolder("cache-test").withTimezone("Asia/Kuala_Lumpur").build();
+    public static void setup() {
+        sherdog = new Sherdog.Builder().withTimezone("Asia/Kuala_Lumpur").build();
 
     }
 
@@ -39,11 +43,8 @@ public class ParserTest {
     @Test
     public void testBuilder() throws IOException {
 
-        assertEquals("cache-test/", sherdog.getCacheFolder());
         assertEquals("Asia/Kuala_Lumpur", sherdog.getZoneId().getId());
 
-        File f = new File(sherdog.getCacheFolder());
-        assertTrue(f.exists());
     }
 
     @Test
@@ -51,9 +52,8 @@ public class ParserTest {
         Organization ufc = sherdog.getOrganization(Organizations.UFC);
 
 
-
         //ufc.getEvents().forEach(System.out::println);
-        assertEquals("Ultimate Fighting Championship", ufc.getName());
+        assertEquals("Ultimate Fighting Championship (UFC)", ufc.getName());
         assertEquals(Organizations.UFC.url, ufc.getSherdogUrl());
 
 
@@ -69,7 +69,7 @@ public class ParserTest {
         Gson gson = new GsonFireBuilder().enableExposeMethodResult().createGsonBuilder().excludeFieldsWithModifiers(Modifier.STATIC, Modifier.TRANSIENT, Modifier.VOLATILE).serializeSpecialFloatingPointValues().create();
         gson.toJson(ufc);
 
-         //ufc.getEvents().forEach(System.out::println);
+        //ufc.getEvents().forEach(System.out::println);
 
 
     }
@@ -87,8 +87,8 @@ public class ParserTest {
         Event ufc1 = sherdog.getEvent("http://www.sherdog.com/events/UFC-1-The-Beginning-7");
 
         assertEquals("UFC 1 - The Beginning", ufc1.getName());
-        assertEquals("Ultimate Fighting Championship", ufc1.getOrganization().getName());
-        assertEquals("http://www.sherdog.com/organizations/Ultimate-Fighting-Championship-2", ufc1.getOrganization().getSherdogUrl());
+        assertEquals("Ultimate Fighting Championship (UFC)", ufc1.getOrganization().getName());
+        assertEquals("http://www.sherdog.com/organizations/Ultimate-Fighting-Championship-UFC-2", ufc1.getOrganization().getSherdogUrl());
         assertEquals(8, ufc1.getFights().size());
         assertEquals("http://www.sherdog.com/events/UFC-1-The-Beginning-7", ufc1.getSherdogUrl());
         assertEquals("1993-11-12T16:00+08:00[Asia/Kuala_Lumpur]", ufc1.getDate().toString());
@@ -132,9 +132,7 @@ public class ParserTest {
         //trying to test on a passed away fighter to make the data won't change
         //RIP Kevin
         Fighter fighter = sherdog.getFighter("http://www.sherdog.com/fighter/Kevin-Randleman-162");
-       // Fighter condit = new FighterParser(Constants.FIGHTER_PICTURE_CACHE_FOLDER, ZoneId.of("Asia/Kuala_Lumpur")).parse("http://www.sherdog.com/fighter/Bec-Rawlings-84964");
-
-
+        // Fighter condit = new FighterParser(Constants.FIGHTER_PICTURE_CACHE_FOLDER, ZoneId.of("Asia/Kuala_Lumpur")).parse("http://www.sherdog.com/fighter/Bec-Rawlings-84964");
 
 
         assertEquals("Kevin Randleman", fighter.getName());
@@ -146,12 +144,7 @@ public class ParserTest {
         assertEquals("5'10\"", fighter.getHeight());
         assertEquals("205 lbs", fighter.getWeight());
         assertEquals("http://www.sherdog.com/fighter/Kevin-Randleman-162", fighter.getSherdogUrl());
-
-        if (fighter.getPicture() != null && fighter.getPicture().trim().length() > 0) {
-            File f = new File(fighter.getPicture());
-            assertTrue(f.exists());
-        }
-
+        assertEquals("http://www.sherdog.com/image_crop/200/300/_images/fighter/20141021014120_IMG_4313.JPG", fighter.getPicture());
         assertEquals(17 + 16, fighter.getFights().size());
 
         //Testing gson in case of stackoverflow.
@@ -185,6 +178,25 @@ public class ParserTest {
         assertEquals("http://www.sherdog.com/events/UVF-4-Universal-Vale-Tudo-Fighting-4-394", fight.getEvent().getSherdogUrl());
         assertEquals("1996-10-22T12:00+08:00[Asia/Kuala_Lumpur]", fight.getDate().toString());
         //assertTrue(fighter.getBirthday() == 0);
+    }
+
+
+    @Test
+    public void testCustomPictureProcessor() throws IOException, ParseException {
+        final Path tempFile = Files.createTempFile("parser-test", "");
+
+        Sherdog sherdog = new Sherdog.Builder().withPictureProcessor((u, f) -> {
+            //downloading a file
+
+            FileUtils.copyURLToFile(new URL(u), tempFile.toFile());
+
+            return tempFile.toAbsolutePath().toString();
+
+        }).build();
+
+        Fighter fighter = sherdog.getFighter("http://www.sherdog.com/fighter/Kevin-Randleman-162");
+        assertEquals("The fighter picture should have the same value as our temp file absolute path", tempFile.toAbsolutePath().toString(), fighter.getPicture());
+
     }
 
 

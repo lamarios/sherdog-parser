@@ -8,46 +8,21 @@ import com.ftpix.sherdogparser.parsers.EventParser;
 import com.ftpix.sherdogparser.parsers.FighterParser;
 import com.ftpix.sherdogparser.parsers.OrganizationParser;
 
-import java.io.File;
 import java.io.IOException;
 import java.text.ParseException;
 import java.time.ZoneId;
+import java.util.function.Function;
 
 /**
  * Created by gz on 20-Aug-16.
  * The main class of sherdog-parser
  */
 public class Sherdog {
-    private String cacheFolder = Constants.FIGHTER_PICTURE_CACHE_FOLDER;
     private ZoneId zoneId = ZoneId.systemDefault();
+    private PictureProcessor pictureProcessor = Constants.DEFAULT_PICTURE_PROCESSOR;
 
 
-    /**
-     * Get the cache folder
-     * @return the path of the cache folder
-     */
-    public String getCacheFolder() {
-        return cacheFolder;
-    }
 
-
-    /**
-     * sets the cache folder, will create it if it doesn't exist
-     * @param cacheFolder where to cache fighter pictures
-     */
-    public void setCacheFolder(String cacheFolder) {
-        if (!cacheFolder.endsWith("/")) {
-            cacheFolder += "/";
-        }
-
-        File f = new File(cacheFolder);
-
-        if (!f.exists()) {
-            f.mkdirs();
-        }
-
-        this.cacheFolder = cacheFolder;
-    }
 
     /**
      * Gets the zone id
@@ -108,9 +83,25 @@ public class Sherdog {
      * @throws ParseException if the page structure has changed
      */
     public Fighter getFighter(String sherdogUrl) throws IOException, ParseException {
-        return new FighterParser(cacheFolder, zoneId).parse(sherdogUrl);
+        return new FighterParser(pictureProcessor, zoneId).parse(sherdogUrl);
     }
 
+
+    /**
+     * Gets a picture processor
+     * @return
+     */
+    public PictureProcessor getPictureProcessor() {
+        return pictureProcessor;
+    }
+
+    /**
+     * Sets a picture processor
+     * @param pictureProcessor
+     */
+    public void setPictureProcessor(PictureProcessor pictureProcessor) {
+        this.pictureProcessor = pictureProcessor;
+    }
 
     /**
      * Builder
@@ -120,11 +111,11 @@ public class Sherdog {
 
         /**
          * Sets a cache folder for the parser
-         * @param folder cache folder for fighter pictures
+         * @param processor the picture processor to user with the parser check {@link PictureProcessor} for more info
          * @return the sherdog current state
          */
-        public Builder withCacheFolder(String folder) {
-            parser.setCacheFolder(folder);
+        public Builder withPictureProcessor(PictureProcessor processor) {
+            parser.setPictureProcessor(processor);
             return this;
         }
 

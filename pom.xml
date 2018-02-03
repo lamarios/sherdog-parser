@@ -6,7 +6,7 @@
 
     <groupId>com.ftpix.</groupId>
     <artifactId>sherdog-parser</artifactId>
-    <version>1.2</version>
+    <version>1.3</version>
     <packaging>jar</packaging>
 
     <name>${groupId}:${artifactId}</name>
@@ -156,6 +156,8 @@
                 </executions>
                 <configuration>
                     <skip>${skip.publish.process}</skip>
+                    <keyname>${gpg.keyname}</keyname>
+                    <passphraseServerId>${gpg.keyname}</passphraseServerId>
                 </configuration>
             </plugin>
 
