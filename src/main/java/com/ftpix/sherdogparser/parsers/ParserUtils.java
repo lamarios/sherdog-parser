@@ -65,8 +65,12 @@ class ParserUtils {
             return usDate.withZoneSameInstant(zoneId);
         } catch (Exception e) {
             //In case the parsing fail, we try without time
-            ZonedDateTime usDate = LocalDate.parse(date, formatter).atStartOfDay(ZoneId.of(Constants.SHERDOG_TIME_ZONE));
-            return usDate.withZoneSameInstant(zoneId);
+            try {
+                ZonedDateTime usDate = LocalDate.parse(date, formatter).atStartOfDay(ZoneId.of(Constants.SHERDOG_TIME_ZONE));
+                return usDate.withZoneSameInstant(zoneId);
+            }catch(DateTimeParseException e2){
+                return null;
+            }
         }
     }
 }

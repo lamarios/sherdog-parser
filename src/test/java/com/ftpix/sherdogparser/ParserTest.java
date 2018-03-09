@@ -182,6 +182,18 @@ public class ParserTest {
 
 
     @Test
+    public void testFighterWithWrongDateFormatInfights() throws IOException, ParseException {
+        Fighter fighter = sherdog.getFighter("http://www.sherdog.com/fighter/Johil-de-Oliveira-6");
+
+        fighter.getFights().forEach(f ->{
+            System.out.println(f.getDate());
+        });
+
+        //will throw exception if fail.
+
+    }
+
+    @Test
     public void testCustomPictureProcessor() throws IOException, ParseException {
         final Path tempFile = Files.createTempFile("parser-test", "");
 
