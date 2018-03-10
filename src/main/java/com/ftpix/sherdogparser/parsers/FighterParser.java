@@ -58,6 +58,7 @@ public class FighterParser implements SherdogParser<Fighter> {
 
     /**
      * FighterPArser with default cache folder location
+     *
      * @param zoneId
      */
     public FighterParser(ZoneId zoneId) {
@@ -193,23 +194,25 @@ public class FighterParser implements SherdogParser<Fighter> {
 
 
         // removing header row...
-        trs.remove(0);
+        if (trs.size() > 0) {
+            trs.remove(0);
 
-        trs.forEach(tr ->{
-            Fight fight = new Fight();
-            fight.setFighter1(sFighter);
+            trs.forEach(tr -> {
+                Fight fight = new Fight();
+                fight.setFighter1(sFighter);
 
-            Elements tds = tr.select("td");
-            fight.setResult(getFightResult(tds.get(COLUMN_RESULT)));
-            fight.setFighter2(getOpponent(tds.get(COLUMN_OPPONENT)));
-            fight.setEvent(getEvent(tds.get(COLUMN_EVENT)));
-            fight.setDate(getDate(tds.get(COLUMN_EVENT)));
-            fight.setWinMethod(getWinMethod(tds.get(COLUMN_METHOD)));
-            fight.setWinRound(getWinRound(tds.get(COLUMN_ROUND)));
-            fight.setWinTime(getWinTime(tds.get(COLUMN_TIME)));
-            fights.add(fight);
-            logger.info("{}", fight);
-        });
+                Elements tds = tr.select("td");
+                fight.setResult(getFightResult(tds.get(COLUMN_RESULT)));
+                fight.setFighter2(getOpponent(tds.get(COLUMN_OPPONENT)));
+                fight.setEvent(getEvent(tds.get(COLUMN_EVENT)));
+                fight.setDate(getDate(tds.get(COLUMN_EVENT)));
+                fight.setWinMethod(getWinMethod(tds.get(COLUMN_METHOD)));
+                fight.setWinRound(getWinRound(tds.get(COLUMN_ROUND)));
+                fight.setWinTime(getWinTime(tds.get(COLUMN_TIME)));
+                fights.add(fight);
+                logger.info("{}", fight);
+            });
+        }
 
         return fights;
     }
@@ -217,20 +220,22 @@ public class FighterParser implements SherdogParser<Fighter> {
 
     /**
      * Get the fight result
+     *
      * @param td a td from sherdogs table
      * @return a fight result enum
      */
-    private FightResult getFightResult(Element td){
+    private FightResult getFightResult(Element td) {
         return ParserUtils.getFightResult(td);
     }
 
 
     /**
      * Get the fight result
+     *
      * @param td a td from sherdogs table
      * @return a fight result enum
      */
-    private SherdogBaseObject getOpponent(Element td){
+    private SherdogBaseObject getOpponent(Element td) {
         SherdogBaseObject opponent = new SherdogBaseObject();
         Element opponentLink = td.select("a").get(0);
         opponent.setName(opponentLink.html());
@@ -242,10 +247,11 @@ public class FighterParser implements SherdogParser<Fighter> {
 
     /**
      * Get the fight event
+     *
      * @param td a td from sherdogs table
      * @return a sherdog base object with url and name
      */
-    private SherdogBaseObject getEvent(Element td){
+    private SherdogBaseObject getEvent(Element td) {
         Element link = td.select("a").get(0);
 
         SherdogBaseObject event = new SherdogBaseObject();
@@ -258,10 +264,11 @@ public class FighterParser implements SherdogParser<Fighter> {
 
     /**
      * Get the date of the fight
+     *
      * @param td a td from sherdogs table
      * @return the zonedatetime of the fight
      */
-    private ZonedDateTime getDate(Element td){
+    private ZonedDateTime getDate(Element td) {
         //date
         Element date = td.select("span.sub_line").first();
         return ParserUtils.getDateFromStringToZoneId(date.html(), ZONE_ID, DateTimeFormatter.ofPattern("MMM / dd / yyyy"));
@@ -270,30 +277,33 @@ public class FighterParser implements SherdogParser<Fighter> {
 
     /**
      * Get the winning method
+     *
      * @param td a td from sherdogs table
      * @return a string with the finishing method
      */
-    private String getWinMethod(Element td){
+    private String getWinMethod(Element td) {
         return td.html().replaceAll("<br>(.*)", "");
     }
 
 
     /**
      * Get the winning round
+     *
      * @param td a td from sherdogs table
      * @return an itneger
      */
-    private int getWinRound(Element td){
-       return Integer.parseInt(td.html());
+    private int getWinRound(Element td) {
+        return Integer.parseInt(td.html());
     }
 
 
     /**
      * Get time of win
+     *
      * @param td a td from sherdogs table
      * @return the time of win
      */
-    private String getWinTime(Element td){
+    private String getWinTime(Element td) {
         return td.html();
     }
 

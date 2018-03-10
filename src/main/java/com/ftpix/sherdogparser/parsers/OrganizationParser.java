@@ -104,39 +104,39 @@ public class OrganizationParser implements SherdogParser<Organization> {
     private List<Event> parseEvent(Elements trs, Organization organization) throws ParseException {
         List<Event> events = new ArrayList<>();
 
-        trs.remove(0);
+        if (trs.size() > 0) {
+            trs.remove(0);
 
 
-        SherdogBaseObject sOrg = new SherdogBaseObject();
-        sOrg.setName(organization.getName());
-        sOrg.setSherdogUrl(organization.getSherdogUrl());
+            SherdogBaseObject sOrg = new SherdogBaseObject();
+            sOrg.setName(organization.getName());
+            sOrg.setSherdogUrl(organization.getSherdogUrl());
 
 
+            trs.forEach(tr -> {
 
-        trs.forEach(tr -> {
+                Event event = new Event();
+                boolean addEvent = true;
+                Elements tds = tr.select("td");
 
-            Event event = new Event();
-            boolean addEvent = true;
-            Elements tds = tr.select("td");
+                event.setOrganization(sOrg);
 
-            event.setOrganization(sOrg);
+                event.setName(getEventName(tds.get(NAME_COLUMN)));
+                event.setSherdogUrl(getEventUrl(tds.get(NAME_COLUMN)));
+                event.setLocation(getElementLocation(tds.get(LOCATION_COLUMN)));
 
-            event.setName(getEventName(tds.get(NAME_COLUMN)));
-            event.setSherdogUrl(getEventUrl(tds.get(NAME_COLUMN)));
-            event.setLocation(getElementLocation(tds.get(LOCATION_COLUMN)));
+                try {
+                    event.setDate(getEventDate(tds.get(DATE_COLUMN)));
+                } catch (DateTimeParseException e) {
+                    logger.error("Couldn't fornat date, we shouldn't add the event", e);
+                    addEvent = false;
+                }
 
-            try {
-                event.setDate(getEventDate(tds.get(DATE_COLUMN)));
-            } catch (DateTimeParseException e) {
-                logger.error("Couldn't fornat date, we shouldn't add the event", e);
-                addEvent = false;
-            }
-
-            if (addEvent) {
-                events.add(event);
-            }
-        });
-
+                if (addEvent) {
+                    events.add(event);
+                }
+            });
+        }
 
         return events;
     }

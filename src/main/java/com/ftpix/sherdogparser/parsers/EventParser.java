@@ -157,28 +157,30 @@ public class EventParser implements SherdogParser<Event> {
 
         List<Fight> fights = new ArrayList<>();
 
-        trs.remove(0);
+        if(trs.size() > 0) {
+            trs.remove(0);
 
-        trs.forEach(tr -> {
-            Fight fight = new Fight();
-            fight.setEvent(sEvent);
-            fight.setDate(event.getDate());
-            Elements tds = tr.select("td");
+            trs.forEach(tr -> {
+                Fight fight = new Fight();
+                fight.setEvent(sEvent);
+                fight.setDate(event.getDate());
+                Elements tds = tr.select("td");
 
-            fight.setFighter1(getFighter(tds.get(FIGHTER1_COLUMN)));
-            fight.setFighter2(getFighter(tds.get(FIGHTER2_COLUMN)));
+                fight.setFighter1(getFighter(tds.get(FIGHTER1_COLUMN)));
+                fight.setFighter2(getFighter(tds.get(FIGHTER2_COLUMN)));
 
-            //parsing old fight, we can get the result
-            if (tds.size() == 7) {
-                fight.setResult(getResult(tds.get(FIGHTER1_COLUMN)));
-                fight.setWinMethod(getMethod(tds.get(METHOD_COLUMN)));
-                fight.setWinRound(getRound(tds.get(ROUND_COLUMN)));
-                fight.setWinTime(getTime(tds.get(TIME_COLUMN)));
-            }
+                //parsing old fight, we can get the result
+                if (tds.size() == 7) {
+                    fight.setResult(getResult(tds.get(FIGHTER1_COLUMN)));
+                    fight.setWinMethod(getMethod(tds.get(METHOD_COLUMN)));
+                    fight.setWinRound(getRound(tds.get(ROUND_COLUMN)));
+                    fight.setWinTime(getTime(tds.get(TIME_COLUMN)));
+                }
 
-            fights.add(fight);
-            logger.info("Fight added: {}", fight);
-        });
+                fights.add(fight);
+                logger.info("Fight added: {}", fight);
+            });
+        }
 
         return fights;
     }

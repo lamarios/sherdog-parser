@@ -193,6 +193,12 @@ public class ParserTest {
 
     }
 
+
+    @Test
+    public void testEventWithIndexOutOfBoundsException() throws IOException, ParseException {
+        Event event = sherdog.getEvent("http://www.sherdog.com/events/DNRF-Ukrainian-Octagon-2-16471");
+    }
+
     @Test
     public void testCustomPictureProcessor() throws IOException, ParseException {
         final Path tempFile = Files.createTempFile("parser-test", "");
