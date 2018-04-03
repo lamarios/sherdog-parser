@@ -1,4 +1,5 @@
 # Sherdog Parser
+![travis-ci](https://travis-ci.org/lamarios/sherdog-parser.svg?branch=master)
 
 Sherdog Parser is Java library to parse through Sherdog and have get all the info about MMA you need.
 
