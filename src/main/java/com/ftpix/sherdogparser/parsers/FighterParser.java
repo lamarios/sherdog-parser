@@ -84,7 +84,7 @@ public class FighterParser implements SherdogParser<Fighter> {
         Document doc = Jsoup.connect(fighter.getSherdogUrl()).timeout(Constants.PARSING_TIMEOUT).get();
 
         try {
-            Elements name = doc.select("h1[itemprop=\"name\"] span.fn");
+            Elements name = doc.select(".bio_fighter h1 span.fn");
             fighter.setName(name.get(0).html());
         } catch (Exception e) {
             // no info, skipping
@@ -92,7 +92,7 @@ public class FighterParser implements SherdogParser<Fighter> {
 
         // Getting nick name
         try {
-            Elements nickname = doc.select("h1[itemprop=\"name\"] span.nickname em");
+            Elements nickname = doc.select(".bio_fighter span.nickname em");
             fighter.setNickname(nickname.get(0).html());
         } catch (Exception e) {
             // no info, skipping
