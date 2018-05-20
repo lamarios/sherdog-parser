@@ -2,31 +2,24 @@ package com.ftpix.sherdogparser.parsers;
 
 import com.ftpix.sherdogparser.Constants;
 import com.ftpix.sherdogparser.PictureProcessor;
-import com.ftpix.sherdogparser.models.Fight;
-import com.ftpix.sherdogparser.models.FightResult;
-import com.ftpix.sherdogparser.models.Fighter;
-import com.ftpix.sherdogparser.models.SherdogBaseObject;
-
+import com.ftpix.sherdogparser.models.*;
+import com.sun.org.apache.bcel.internal.generic.GETFIELD;
 import org.apache.commons.codec.digest.DigestUtils;
-import org.apache.commons.io.FileUtils;
-import org.jsoup.Jsoup;
 import org.jsoup.nodes.Document;
 import org.jsoup.nodes.Element;
 import org.jsoup.select.Elements;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import java.io.File;
 import java.io.IOException;
-import java.net.URL;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
+import java.time.Instant;
 import java.time.ZoneId;
 import java.time.ZonedDateTime;
 import java.time.format.DateTimeFormatter;
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.List;
+import java.util.*;
+import java.util.stream.Collectors;
 
 /**
  * Created by gz on 20-Aug-16.
@@ -81,7 +74,7 @@ public class FighterParser implements SherdogParser<Fighter> {
         fighter.setSherdogUrl(url);
 
         logger.info("Refreshing fighter {}", fighter.getSherdogUrl());
-        Document doc = Jsoup.connect(fighter.getSherdogUrl()).timeout(Constants.PARSING_TIMEOUT).get();
+        Document doc = ParserUtils.parseDocument(url);
 
         try {
             Elements name = doc.select(".bio_fighter h1 span.fn");
@@ -150,21 +143,44 @@ public class FighterParser implements SherdogParser<Fighter> {
         }
 
         Elements picture = doc.select(".bio_fighter .content img[itemprop=\"image\"]");
-        String pictureUrl = picture.attr("src").trim();
+        String pictureUrl = "https://www.sherdog.com" + picture.attr("src").trim();
 
 
         Elements fightTables = doc.select(".fight_history ");
         logger.info("Found {} fight history tables", fightTables.size());
 
-        fightTables.stream()
-                .filter(div -> div.select(".module_header h2").html().trim().equalsIgnoreCase("FIGHT HISTORY - PRO"))
-                .map(div -> div.select(".table table tr"))
-                .filter(tdList -> tdList.size() > 0)
-                .findFirst()
-                .ifPresent((tdList -> fighter.setFights(getFights(tdList, fighter))));
 
-        //fighter.getFights().sort((f1, f2) -> f1.getDate().compareTo(f2.getDate()));
-        Collections.reverse(fighter.getFights());
+        fightTables.stream()
+                //excluding upcoming fights
+                .filter(div -> !div.select(".module_header h2").html().trim().contains("Upcoming"))
+                .collect(Collectors.groupingBy(div -> {
+                    String categoryName = div.select(".module_header h2").html().trim().replaceAll("(?i)FIGHT HISTORY - ", "").trim();
+
+                    return FightType.fromString(categoryName);
+                }))
+                .forEach((key, div) -> {
+                    div.stream()
+                            .map(d -> d.select(".table table tr"))
+                            .filter(tdList -> tdList.size() > 0)
+                            .findFirst()
+                            .ifPresent(tdList -> {
+                                        List<Fight> f = getFights(tdList, fighter);
+
+                                        f.forEach(fight -> fight.setType(key));
+
+                                        fighter.getFights().addAll(f);
+                                    }
+                            );
+                });
+
+        List<Fight> sorted = fighter.getFights()
+                .stream()
+                .sorted(Comparator.comparing(Fight::getDate, Comparator.nullsFirst(Comparator.naturalOrder())))
+                .collect(Collectors.toList());
+
+        fighter.setFights(sorted);
+
+
         logger.info("Found {} fights for {}", fighter.getFights().size(), fighter.getName());
 
         //setting the picture last to make sure the fighter variable has all the data
@@ -271,7 +287,9 @@ public class FighterParser implements SherdogParser<Fighter> {
     private ZonedDateTime getDate(Element td) {
         //date
         Element date = td.select("span.sub_line").first();
-        return ParserUtils.getDateFromStringToZoneId(date.html(), ZONE_ID, DateTimeFormatter.ofPattern("MMM / dd / yyyy"));
+        ZonedDateTime dateFromStringToZoneId = ParserUtils.getDateFromStringToZoneId(date.html(), ZONE_ID, DateTimeFormatter.ofPattern("MMM / dd / yyyy"));
+
+        return dateFromStringToZoneId;
     }
 
 

@@ -1,30 +1,20 @@
 package com.ftpix.sherdogparser;
 
+import com.ftpix.sherdogparser.models.*;
+import com.ftpix.sherdogparser.parsers.ParserUtils;
 import com.google.gson.Gson;
-
-import com.ftpix.sherdogparser.models.Event;
-import com.ftpix.sherdogparser.models.Fight;
-import com.ftpix.sherdogparser.models.FightResult;
-import com.ftpix.sherdogparser.models.Fighter;
-import com.ftpix.sherdogparser.models.Organization;
-import com.ftpix.sherdogparser.models.Organizations;
-
-import org.apache.commons.io.FileUtils;
+import io.gsonfire.GsonFireBuilder;
 import org.junit.BeforeClass;
 import org.junit.Test;
 
-import java.io.File;
+import javax.swing.text.html.parser.Parser;
 import java.io.IOException;
 import java.lang.reflect.Modifier;
-import java.net.URL;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.text.ParseException;
 
-import io.gsonfire.GsonFireBuilder;
-
 import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertTrue;
 
 /**
  * Created by gz on 20-Aug-16.
@@ -59,7 +49,7 @@ public class ParserTest {
 
         Event ufc1 = ufc.getEvents().get(0);
         assertEquals("UFC 1 - The Beginning", ufc1.getName());
-        assertEquals("http://www.sherdog.com/events/UFC-1-The-Beginning-7", ufc1.getSherdogUrl());
+        assertEquals("https://www.sherdog.com/events/UFC-1-The-Beginning-7", ufc1.getSherdogUrl());
         assertEquals(ufc.getName(), ufc1.getOrganization().getName());
         assertEquals(ufc.getSherdogUrl(), ufc1.getOrganization().getSherdogUrl());
         assertEquals("1993-11-12T16:00+08:00[Asia/Kuala_Lumpur]", ufc1.getDate().toString());
@@ -84,41 +74,41 @@ public class ParserTest {
 
         //System.out.println(gson.toJson(test));
 
-        Event ufc1 = sherdog.getEvent("http://www.sherdog.com/events/UFC-1-The-Beginning-7");
+        Event ufc1 = sherdog.getEvent("https://www.sherdog.com/events/UFC-1-The-Beginning-7");
 
         assertEquals("UFC 1 - The Beginning", ufc1.getName());
         assertEquals("Ultimate Fighting Championship (UFC)", ufc1.getOrganization().getName());
-        assertEquals("http://www.sherdog.com/organizations/Ultimate-Fighting-Championship-UFC-2", ufc1.getOrganization().getSherdogUrl());
+        assertEquals("https://www.sherdog.com/organizations/Ultimate-Fighting-Championship-UFC-2", ufc1.getOrganization().getSherdogUrl());
         assertEquals(8, ufc1.getFights().size());
-        assertEquals("http://www.sherdog.com/events/UFC-1-The-Beginning-7", ufc1.getSherdogUrl());
+        assertEquals("https://www.sherdog.com/events/UFC-1-The-Beginning-7", ufc1.getSherdogUrl());
         assertEquals("1993-11-12T16:00+08:00[Asia/Kuala_Lumpur]", ufc1.getDate().toString());
 
         //Testing main event
         Fight fight = ufc1.getFights().get(0);
         assertEquals(FightResult.FIGHTER_1_WIN, fight.getResult());
-        assertEquals("http://www.sherdog.com/fighter/Royce-Gracie-19", fight.getFighter1().getSherdogUrl());
+        assertEquals("https://www.sherdog.com/fighter/Royce-Gracie-19", fight.getFighter1().getSherdogUrl());
         assertEquals("Royce Gracie", fight.getFighter1().getName());
-        assertEquals("http://www.sherdog.com/fighter/Gerard-Gordeau-15", fight.getFighter2().getSherdogUrl());
+        assertEquals("https://www.sherdog.com/fighter/Gerard-Gordeau-15", fight.getFighter2().getSherdogUrl());
         assertEquals("Gerard Gordeau", fight.getFighter2().getName());
         assertEquals("Submission (Rear-Naked Choke)", fight.getWinMethod());
         assertEquals(1, fight.getWinRound());
         assertEquals("1:44", fight.getWinTime());
         assertEquals("UFC 1 - The Beginning", fight.getEvent().getName());
-        assertEquals("http://www.sherdog.com/events/UFC-1-The-Beginning-7", fight.getEvent().getSherdogUrl());
+        assertEquals("https://www.sherdog.com/events/UFC-1-The-Beginning-7", fight.getEvent().getSherdogUrl());
         assertEquals("1993-11-12T16:00+08:00[Asia/Kuala_Lumpur]", fight.getDate().toString());
 
         //Testing main event
         fight = ufc1.getFights().get(6);
         assertEquals(FightResult.FIGHTER_1_WIN, fight.getResult());
-        assertEquals("http://www.sherdog.com/fighter/Kevin-Rosier-17", fight.getFighter1().getSherdogUrl());
+        assertEquals("https://www.sherdog.com/fighter/Kevin-Rosier-17", fight.getFighter1().getSherdogUrl());
         assertEquals("Kevin Rosier", fight.getFighter1().getName());
-        assertEquals("http://www.sherdog.com/fighter/Zane-Frazier-18", fight.getFighter2().getSherdogUrl());
+        assertEquals("https://www.sherdog.com/fighter/Zane-Frazier-18", fight.getFighter2().getSherdogUrl());
         assertEquals("Zane Frazier", fight.getFighter2().getName());
         assertEquals("TKO (Punches)", fight.getWinMethod());
         assertEquals(1, fight.getWinRound());
         assertEquals("4:20", fight.getWinTime());
         assertEquals("UFC 1 - The Beginning", fight.getEvent().getName());
-        assertEquals("http://www.sherdog.com/events/UFC-1-The-Beginning-7", fight.getEvent().getSherdogUrl());
+        assertEquals("https://www.sherdog.com/events/UFC-1-The-Beginning-7", fight.getEvent().getSherdogUrl());
         assertEquals("1993-11-12T16:00+08:00[Asia/Kuala_Lumpur]", fight.getDate().toString());
 
         //Testing gson in case of stackoverflow.
@@ -129,10 +119,10 @@ public class ParserTest {
 
     @Test
     public void testFighterParser() throws IOException, ParseException {
-        //trying to test on a passed away fighter to make the data won't change
+        //trying to test on a passed away fighter to make sure the data won't change
         //RIP Kevin
-        Fighter fighter = sherdog.getFighter("http://www.sherdog.com/fighter/Kevin-Randleman-162");
-        // Fighter condit = new FighterParser(Constants.FIGHTER_PICTURE_CACHE_FOLDER, ZoneId.of("Asia/Kuala_Lumpur")).parse("http://www.sherdog.com/fighter/Bec-Rawlings-84964");
+        Fighter fighter = sherdog.getFighter("https://www.sherdog.com/fighter/Kevin-Randleman-162");
+        // Fighter condit = new FighterParser(Constants.FIGHTER_PICTURE_CACHE_FOLDER, ZoneId.of("Asia/Kuala_Lumpur")).parse("https://www.sherdog.com/fighter/Bec-Rawlings-84964");
 
 
         assertEquals("Kevin Randleman", fighter.getName());
@@ -143,8 +133,8 @@ public class ParserTest {
         assertEquals("The Monster", fighter.getNickname());
         assertEquals("5'10\"", fighter.getHeight());
         assertEquals("205 lbs", fighter.getWeight());
-        assertEquals("http://www.sherdog.com/fighter/Kevin-Randleman-162", fighter.getSherdogUrl());
-        assertEquals("http://www.sherdog.com/image_crop/200/300/_images/fighter/20141021014120_IMG_4313.JPG", fighter.getPicture());
+        assertEquals("https://www.sherdog.com/fighter/Kevin-Randleman-162", fighter.getSherdogUrl());
+        assertEquals("https://www.sherdog.com/image_crop/200/300/_images/fighter/20141021014120_IMG_4313.JPG", fighter.getPicture());
         assertEquals(17 + 16, fighter.getFights().size());
 
         //Testing gson in case of stackoverflow.
@@ -157,25 +147,25 @@ public class ParserTest {
         //fighter.getFights().forEach(System.out::println);
 
         assertEquals(FightResult.FIGHTER_2_WIN, fight.getResult());
-        assertEquals("http://www.sherdog.com/fighter/Magomedbag-Agaev-11793", fight.getFighter2().getSherdogUrl());
+        assertEquals("https://www.sherdog.com/fighter/Magomedbag-Agaev-11793", fight.getFighter2().getSherdogUrl());
         assertEquals("Magomedbag Agaev", fight.getFighter2().getName());
         assertEquals("Submission (Armbar)", fight.getWinMethod());
         assertEquals(1, fight.getWinRound());
         assertEquals("4:05", fight.getWinTime());
         assertEquals("FEFoMP - Mayor's Cup 2011", fight.getEvent().getName());
-        assertEquals("http://www.sherdog.com/events/FEFoMP-Mayors-Cup-2011-16778", fight.getEvent().getSherdogUrl());
+        assertEquals("https://www.sherdog.com/events/FEFoMP-Mayors-Cup-2011-16778", fight.getEvent().getSherdogUrl());
         assertEquals("2011-05-07T12:00+08:00[Asia/Kuala_Lumpur]", fight.getDate().toString());
         //Testing fight with award span
-        fight = fighter.getFights().get(2);
+        fight = fighter.getFights().get(0);
 
         assertEquals(FightResult.FIGHTER_1_WIN, fight.getResult());
-        assertEquals("http://www.sherdog.com/fighter/Dan-Bobish-174", fight.getFighter2().getSherdogUrl());
+        assertEquals("https://www.sherdog.com/fighter/Dan-Bobish-174", fight.getFighter2().getSherdogUrl());
         assertEquals("Dan Bobish", fight.getFighter2().getName());
         assertEquals("Submission (Punches)", fight.getWinMethod());
         assertEquals(1, fight.getWinRound());
         assertEquals("5:50", fight.getWinTime());
         assertEquals("UVF 4 - Universal Vale Tudo Fighting 4", fight.getEvent().getName());
-        assertEquals("http://www.sherdog.com/events/UVF-4-Universal-Vale-Tudo-Fighting-4-394", fight.getEvent().getSherdogUrl());
+        assertEquals("https://www.sherdog.com/events/UVF-4-Universal-Vale-Tudo-Fighting-4-394", fight.getEvent().getSherdogUrl());
         assertEquals("1996-10-22T12:00+08:00[Asia/Kuala_Lumpur]", fight.getDate().toString());
         //assertTrue(fighter.getBirthday() == 0);
     }
@@ -183,9 +173,9 @@ public class ParserTest {
 
     @Test
     public void testFighterWithWrongDateFormatInfights() throws IOException, ParseException {
-        Fighter fighter = sherdog.getFighter("http://www.sherdog.com/fighter/Johil-de-Oliveira-6");
+        Fighter fighter = sherdog.getFighter("https://www.sherdog.com/fighter/Johil-de-Oliveira-6");
 
-        fighter.getFights().forEach(f ->{
+        fighter.getFights().forEach(f -> {
             System.out.println(f.getDate());
         });
 
@@ -196,7 +186,7 @@ public class ParserTest {
 
     @Test
     public void testEventWithIndexOutOfBoundsException() throws IOException, ParseException {
-        Event event = sherdog.getEvent("http://www.sherdog.com/events/DNRF-Ukrainian-Octagon-2-16471");
+        Event event = sherdog.getEvent("https://www.sherdog.com/events/DNRF-Ukrainian-Octagon-2-16471");
     }
 
     @Test
@@ -206,16 +196,81 @@ public class ParserTest {
         Sherdog sherdog = new Sherdog.Builder().withPictureProcessor((u, f) -> {
             //downloading a file
 
-            FileUtils.copyURLToFile(new URL(u), tempFile.toFile());
+            ParserUtils.downloadImageToFile(u, tempFile);
 
             return tempFile.toAbsolutePath().toString();
 
         }).build();
 
-        Fighter fighter = sherdog.getFighter("http://www.sherdog.com/fighter/Kevin-Randleman-162");
+        Fighter fighter = sherdog.getFighter("https://www.sherdog.com/fighter/Kevin-Randleman-162");
         assertEquals("The fighter picture should have the same value as our temp file absolute path", tempFile.toAbsolutePath().toString(), fighter.getPicture());
 
     }
 
+
+    @Test
+    public void testGettingFightType() throws IOException, ParseException {
+        Event event = sherdog.getEvent("http://www.sherdog.com/events/UFC-Fight-Night-115-Volkov-vs-Struve-58751");
+        assertEquals(FightType.PRO, ParserUtils.getFightType(sherdog, event.getFights().get(7)));
+
+
+        Fighter fighter = sherdog.getFighter("http://www.sherdog.com/fighter/Rose-Namajunas-69083");
+
+        assertEquals(FightType.AMATEUR, fighter.getFights().get(0).getType());
+        assertEquals(FightType.PRO_EXHIBITION, fighter.getFights().get(7).getType());
+        assertEquals(FightType.PRO, fighter.getFights().get(10).getType());
+
+
+        //Testing the method that will try to find the fight type if not available
+        event = sherdog.getEvent("http://www.sherdog.com/events/KOTC-Trump-Card-19961");
+
+        Fight fight = event.getFights().get(10);
+        assertEquals(FightType.AMATEUR, ParserUtils.getFightType(sherdog, fight));
+
+        fight = event.getFights().get(1);
+        assertEquals(FightType.PRO, ParserUtils.getFightType(sherdog, fight));
+
+
+        //test fight that is failing in MMATH
+        event = sherdog.getEvent("https://www.sherdog.com/events/Invicta-FC-2-Baszler-vs-McMann-22035");
+        fight = event.getFights().get(1);
+        assertEquals(FightType.PRO, ParserUtils.getFightType(sherdog, fight));
+
+    }
+
+
+    /**
+     * Sherdog recently changed this so testing it
+     *
+     * @throws IOException
+     * @throws ParseException
+     */
+    @Test
+    public void testFightResults() throws IOException, ParseException {
+
+        //from fighters
+        Fighter fighter = sherdog.getFighter("https://www.sherdog.com/fighter/Matt-Baker-49956");
+
+        assertEquals(FightResult.NO_CONTEST, fighter.getFights().get(18).getResult());
+
+
+        fighter = sherdog.getFighter("https://www.sherdog.com/fighter/Mark-Hunt-10668");
+        assertEquals(FightResult.DRAW, fighter.getFights().get(17).getResult());
+        assertEquals(FightResult.FIGHTER_2_WIN, fighter.getFights().get(0).getResult());
+        assertEquals(FightResult.FIGHTER_1_WIN, fighter.getFights().get(1).getResult());
+
+
+        //from events
+        Event event = sherdog.getEvent("https://www.sherdog.com/events/WSOF-18-Moraes-vs-Hill-43147");
+        Fight fight = event.getFights().get(6);
+        assertEquals(FightResult.NO_CONTEST, fight.getResult());
+        assertEquals(FightResult.FIGHTER_1_WIN, event.getFights().get(0).getResult());
+
+
+        //draw
+        event = sherdog.getEvent("https://www.sherdog.com/events/UFC-Fight-Night-33-Hunt-vs-Bigfoot-32293");
+        assertEquals(FightResult.DRAW, event.getFights().get(0).getResult());
+
+    }
 
 }

@@ -1,11 +1,8 @@
 package com.ftpix.sherdogparser.parsers;
 
-import com.ftpix.sherdogparser.Constants;
 import com.ftpix.sherdogparser.models.Event;
 import com.ftpix.sherdogparser.models.Organization;
 import com.ftpix.sherdogparser.models.SherdogBaseObject;
-
-import org.jsoup.Jsoup;
 import org.jsoup.nodes.Document;
 import org.jsoup.nodes.Element;
 import org.jsoup.select.Elements;
@@ -57,11 +54,11 @@ public class OrganizationParser implements SherdogParser<Organization> {
         Organization organization = new Organization();
         organization.setSherdogUrl(url);
 
-        url += "/recent-events/";
+        url += "/recent-events/%d";
         int page = 1;
 
 
-        Document doc = Jsoup.connect(url + page).timeout(Constants.PARSING_TIMEOUT).get();
+        Document doc = ParserUtils.parseDocument(String.format(url, page));
 
         logger.info("Getting name");
         Elements name = doc.select(".bio_organization .module_header h2[itemprop=\"name\"");
@@ -77,7 +74,7 @@ public class OrganizationParser implements SherdogParser<Organization> {
         do {
             logger.info("Parsing page [{}]", page);
 
-            doc = Jsoup.connect(url + page).timeout(Constants.PARSING_TIMEOUT).get();
+            doc = ParserUtils.parseDocument(String.format(url, page));
             Elements events = doc.select("#recent_tab .event tr");
 
             toAdd = parseEvent(events, organization);
@@ -143,26 +140,43 @@ public class OrganizationParser implements SherdogParser<Organization> {
 
     private String getElementLocation(Element td) {
         String[] split = td.html().split(">");
-        return split[1].trim();
+        if (split.length > 1) {
+            return split[1].trim();
+        } else {
+            return "";
+        }
     }
 
     private String getEventName(Element td) {
         Elements nameElement = td.select("span[itemprop=\"name\"");
-        String name = nameElement.get(0).html();
-        name = name.replaceAll("( )+", " ").trim();
 
-        return name;
+        if (nameElement.size() > 0) {
+            String name = nameElement.get(0).html();
+            name = name.replaceAll("( )+", " ").trim();
+            return name;
+        } else {
+            return "";
+        }
     }
 
     private String getEventUrl(Element td) {
         Elements url = td.select("a[itemprop=\"url\"");
-        return url.get(0).attr("abs:href");
+        if (url.size() > 0) {
+            String attr = url.get(0).attr("abs:href");
+            return attr;
+        } else {
+            return "";
+        }
     }
 
     private ZonedDateTime getEventDate(Element element) {
         Elements metaDate = element.select("meta[itemprop=\"startDate\"");
-        String date = metaDate.get(0).attr("content");
+        if (metaDate.size() > 0) {
+            String date = metaDate.get(0).attr("content");
 
-        return ParserUtils.getDateFromStringToZoneId(date, ZONE_ID);
+            return ParserUtils.getDateFromStringToZoneId(date, ZONE_ID);
+        } else {
+            return null;
+        }
     }
 }

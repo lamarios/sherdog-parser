@@ -1,8 +1,6 @@
 package com.ftpix.sherdogparser.models;
 
-import java.util.ArrayList;
-import java.util.Date;
-import java.util.List;
+import java.util.*;
 
 
 public class Fighter extends SherdogBaseObject {
@@ -17,7 +15,6 @@ public class Fighter extends SherdogBaseObject {
     private int nc = 0;
     private String picture = "";
     private List<Fight> fights = new ArrayList<>();
-
 
 
     public String getNickname() {

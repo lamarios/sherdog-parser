@@ -3,6 +3,8 @@ package com.ftpix.sherdogparser.models;
 import java.time.ZonedDateTime;
 
 public class Fight {
+
+
     private SherdogBaseObject event;
     private SherdogBaseObject fighter1;
     private SherdogBaseObject fighter2;
@@ -10,6 +12,7 @@ public class Fight {
     private FightResult result = FightResult.NOT_HAPPENED;
     private String winMethod, winTime;
     private int winRound;
+    private FightType type;
 
     public SherdogBaseObject getEvent() {
         return event;
@@ -75,6 +78,13 @@ public class Fight {
         this.winRound = winRound;
     }
 
+    public FightType getType() {
+        return type;
+    }
+
+    public void setType(FightType type) {
+        this.type = type;
+    }
 
     public boolean equals(Object obj) {
         try {
@@ -86,6 +96,7 @@ public class Fight {
             return false;
         }
     }
+
 
 
     @Override

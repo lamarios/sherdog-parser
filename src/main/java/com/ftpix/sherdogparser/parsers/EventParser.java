@@ -1,12 +1,6 @@
 package com.ftpix.sherdogparser.parsers;
 
-import com.ftpix.sherdogparser.Constants;
-import com.ftpix.sherdogparser.models.Event;
-import com.ftpix.sherdogparser.models.Fight;
-import com.ftpix.sherdogparser.models.FightResult;
-import com.ftpix.sherdogparser.models.SherdogBaseObject;
-
-import org.jsoup.Jsoup;
+import com.ftpix.sherdogparser.models.*;
 import org.jsoup.nodes.Document;
 import org.jsoup.nodes.Element;
 import org.jsoup.select.Elements;
@@ -44,6 +38,7 @@ public class EventParser implements SherdogParser<Event> {
         this.ZONE_ID = ZoneId.systemDefault();
     }
 
+
     /**
      * Parse a sherdog page
      *
@@ -56,7 +51,7 @@ public class EventParser implements SherdogParser<Event> {
         Event event = new Event();
         event.setSherdogUrl(url);
 
-        Document doc = Jsoup.connect(url).timeout(Constants.PARSING_TIMEOUT).get();
+        Document doc = ParserUtils.parseDocument(url);
 
         //getting name
         Elements name = doc.select(".header .section_title h1 span[itemprop=\"name\"]");
@@ -77,6 +72,7 @@ public class EventParser implements SherdogParser<Event> {
         SherdogBaseObject organization = new SherdogBaseObject();
         organization.setSherdogUrl(org.attr("abs:href"));
         organization.setName(org.select("span[itemprop=\"name\"").get(0).html());
+
 
         event.setOrganization(organization);
         return event;
@@ -146,7 +142,6 @@ public class EventParser implements SherdogParser<Event> {
     }
 
 
-
     /**
      * Parse fights of an old event
      */
@@ -157,7 +152,7 @@ public class EventParser implements SherdogParser<Event> {
 
         List<Fight> fights = new ArrayList<>();
 
-        if(trs.size() > 0) {
+        if (trs.size() > 0) {
             trs.remove(0);
 
             trs.forEach(tr -> {
@@ -187,23 +182,36 @@ public class EventParser implements SherdogParser<Event> {
 
     /**
      * Get a fighter
+     *
      * @param td element from sherdog's table
      * @return return a sherdogbaseobject with the fighter name and url
      */
     private SherdogBaseObject getFighter(Element td) {
 
         Elements name1 = td.select("span[itemprop=\"name\"]");
-        String name = name1.get(0).html();
-        String url = td.select("a[itemprop=\"url\"]").get(0).attr("abs:href");
 
-        SherdogBaseObject fighter = new SherdogBaseObject();
-        fighter.setSherdogUrl(url);
-        fighter.setName(name);
-        return fighter;
+        if (name1.size() > 0) {
+
+            String name = name1.get(0).html();
+
+            Elements select = td.select("a[itemprop=\"url\"]");
+
+            if (select.size() > 0) {
+                String url = select.get(0).attr("abs:href");
+
+                SherdogBaseObject fighter = new SherdogBaseObject();
+                fighter.setSherdogUrl(url);
+                fighter.setName(name);
+                return fighter;
+            }
+        }
+
+        return null;
     }
 
     /**
      * get the time at which teh fight finished
+     *
      * @param td element from sherdog's table
      * @return get the time of the event
      */
@@ -214,6 +222,7 @@ public class EventParser implements SherdogParser<Event> {
 
     /**
      * get the round at which the even finished
+     *
      * @param td element from sherdog's table
      * @return the round number
      */
@@ -223,7 +232,6 @@ public class EventParser implements SherdogParser<Event> {
 
 
     /**
-     *
      * @param td element from sherdog's table
      * @return get the win method
      */
@@ -232,7 +240,8 @@ public class EventParser implements SherdogParser<Event> {
     }
 
     /**
-     *  get the result of the fight
+     * get the result of the fight
+     *
      * @param td element from sherdog's table
      * @return a rightresult enum
      */
