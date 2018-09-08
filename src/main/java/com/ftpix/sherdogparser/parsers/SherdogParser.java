@@ -1,5 +1,10 @@
 package com.ftpix.sherdogparser.parsers;
 
+import com.ftpix.sherdogparser.exceptions.NotASherdogURLException;
+import com.ftpix.sherdogparser.exceptions.SherdogParserException;
+import org.jsoup.Jsoup;
+import org.jsoup.nodes.Document;
+
 import java.io.IOException;
 import java.text.ParseException;
 
@@ -17,5 +22,33 @@ public interface SherdogParser<T> {
      * @throws IOException    if connecting to sherdog fails
      * @throws ParseException if the page structure has changed
      */
-    public T parse(String url) throws IOException, ParseException;
+    default T parse(String url) throws IOException, ParseException, SherdogParserException {
+
+
+        if(!url.startsWith("https://www.sherdog.com/")){
+            throw new NotASherdogURLException();
+        }
+
+        Document doc = ParserUtils.parseDocument(url);
+        return parseDocument(doc);
+    }
+
+
+    /**
+     * Parses a document from the HTML source code directly
+     *
+     * @param html the HTML source code
+     * @return the parser object
+     */
+    default T parseFromHtml(String html) throws IOException, ParseException {
+        return parseDocument(Jsoup.parse(html));
+    }
+
+    /**
+     * Parses a jsoup document
+     *
+     * @param doc
+     * @return
+     */
+    T parseDocument(Document doc) throws ParseException, IOException;
 }

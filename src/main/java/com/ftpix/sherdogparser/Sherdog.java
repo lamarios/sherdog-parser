@@ -1,5 +1,6 @@
 package com.ftpix.sherdogparser;
 
+import com.ftpix.sherdogparser.exceptions.SherdogParserException;
 import com.ftpix.sherdogparser.models.Event;
 import com.ftpix.sherdogparser.models.Fighter;
 import com.ftpix.sherdogparser.models.Organization;
@@ -48,7 +49,7 @@ public class Sherdog {
      * @throws IOException if connecting to sherdog fails
      * @throws ParseException if the page structure has changed
      */
-    public Organization getOrganization(String sherdogUrl) throws IOException, ParseException {
+    public Organization getOrganization(String sherdogUrl) throws IOException, ParseException, SherdogParserException {
         return new OrganizationParser(zoneId).parse(sherdogUrl);
     }
 
@@ -60,7 +61,7 @@ public class Sherdog {
      * @throws IOException if connecting to sherdog fails
      * @throws ParseException if the page structure has changed
      */
-    public Organization getOrganization(Organizations organization) throws IOException, ParseException {
+    public Organization getOrganization(Organizations organization) throws IOException, ParseException, SherdogParserException {
         return new OrganizationParser(zoneId).parse(organization.url);
     }
 
@@ -71,7 +72,7 @@ public class Sherdog {
      * @throws IOException if connecting to sherdog fails
      * @throws ParseException if the page structure has changed
      */
-    public Event getEvent(String sherdogUrl) throws IOException, ParseException {
+    public Event getEvent(String sherdogUrl) throws IOException, ParseException, SherdogParserException {
         return new EventParser(zoneId).parse(sherdogUrl);
     }
 
@@ -82,7 +83,7 @@ public class Sherdog {
      * @throws IOException if connecting to sherdog fails
      * @throws ParseException if the page structure has changed
      */
-    public Fighter getFighter(String sherdogUrl) throws IOException, ParseException {
+    public Fighter getFighter(String sherdogUrl) throws IOException, ParseException, SherdogParserException {
         return new FighterParser(pictureProcessor, zoneId).parse(sherdogUrl);
     }
 

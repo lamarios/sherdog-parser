@@ -64,6 +64,7 @@ public class ParserUtils {
                 .get();
     }
 
+
     /**
      * Converts a String to the given timezone.
      *
@@ -165,5 +166,16 @@ public class ParserUtils {
         }
 
 
+    }
+
+
+    /**
+     * Gets the url of a page using the meta tags in head
+     * @param doc
+     * @return
+     */
+    public static String getSherdogPageUrl(Document doc){
+        String url = doc.head().select("meta[property=\"og:url\"").attr("content");
+        return url.replace("http://", "https://"); //forcing https, for secure scrapping
     }
 }

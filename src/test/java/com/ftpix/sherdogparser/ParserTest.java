@@ -1,5 +1,6 @@
 package com.ftpix.sherdogparser;
 
+import com.ftpix.sherdogparser.exceptions.SherdogParserException;
 import com.ftpix.sherdogparser.models.*;
 import com.ftpix.sherdogparser.parsers.ParserUtils;
 import com.google.gson.Gson;
@@ -38,7 +39,7 @@ public class ParserTest {
     }
 
     @Test
-    public void testOrganizationParser() throws IOException, ParseException {
+    public void testOrganizationParser() throws IOException, ParseException, SherdogParserException {
         Organization ufc = sherdog.getOrganization(Organizations.UFC);
 
 
@@ -65,9 +66,9 @@ public class ParserTest {
     }
 
     @Test
-    public void testEventParser() throws IOException, ParseException {
+    public void testEventParser() throws IOException, ParseException, SherdogParserException {
 //
-//        Event test = new EventParser(ZoneId.of("Asia/Kuala_Lumpur")).parse("http://www.sherdog.com/events/UFC-Mexico-City-51653");
+//        Event test = new EventParser(ZoneId.of("Asia/Kuala_Lumpur")).parse("https://www.sherdog.com/events/UFC-Mexico-City-51653");
 //        System.out.println(test);
 //        test.getFights().forEach(System.out::println);
 
@@ -118,7 +119,7 @@ public class ParserTest {
     }
 
     @Test
-    public void testFighterParser() throws IOException, ParseException {
+    public void testFighterParser() throws IOException, ParseException, SherdogParserException {
         //trying to test on a passed away fighter to make sure the data won't change
         //RIP Kevin
         Fighter fighter = sherdog.getFighter("https://www.sherdog.com/fighter/Kevin-Randleman-162");
@@ -172,7 +173,7 @@ public class ParserTest {
 
 
     @Test
-    public void testFighterWithWrongDateFormatInfights() throws IOException, ParseException {
+    public void testFighterWithWrongDateFormatInfights() throws IOException, ParseException, SherdogParserException {
         Fighter fighter = sherdog.getFighter("https://www.sherdog.com/fighter/Johil-de-Oliveira-6");
 
         fighter.getFights().forEach(f -> {
@@ -185,12 +186,12 @@ public class ParserTest {
 
 
     @Test
-    public void testEventWithIndexOutOfBoundsException() throws IOException, ParseException {
+    public void testEventWithIndexOutOfBoundsException() throws IOException, ParseException, SherdogParserException {
         Event event = sherdog.getEvent("https://www.sherdog.com/events/DNRF-Ukrainian-Octagon-2-16471");
     }
 
     @Test
-    public void testCustomPictureProcessor() throws IOException, ParseException {
+    public void testCustomPictureProcessor() throws IOException, ParseException, SherdogParserException {
         final Path tempFile = Files.createTempFile("parser-test", "");
 
         Sherdog sherdog = new Sherdog.Builder().withPictureProcessor((u, f) -> {
@@ -209,12 +210,12 @@ public class ParserTest {
 
 
     @Test
-    public void testGettingFightType() throws IOException, ParseException {
-        Event event = sherdog.getEvent("http://www.sherdog.com/events/UFC-Fight-Night-115-Volkov-vs-Struve-58751");
+    public void testGettingFightType() throws IOException, ParseException, SherdogParserException {
+        Event event = sherdog.getEvent("https://www.sherdog.com/events/UFC-Fight-Night-115-Volkov-vs-Struve-58751");
         assertEquals(FightType.PRO, ParserUtils.getFightType(sherdog, event.getFights().get(7)));
 
 
-        Fighter fighter = sherdog.getFighter("http://www.sherdog.com/fighter/Rose-Namajunas-69083");
+        Fighter fighter = sherdog.getFighter("https://www.sherdog.com/fighter/Rose-Namajunas-69083");
 
         assertEquals(FightType.AMATEUR, fighter.getFights().get(0).getType());
         assertEquals(FightType.PRO_EXHIBITION, fighter.getFights().get(7).getType());
@@ -222,7 +223,7 @@ public class ParserTest {
 
 
         //Testing the method that will try to find the fight type if not available
-        event = sherdog.getEvent("http://www.sherdog.com/events/KOTC-Trump-Card-19961");
+        event = sherdog.getEvent("https://www.sherdog.com/events/KOTC-Trump-Card-19961");
 
         Fight fight = event.getFights().get(10);
         assertEquals(FightType.AMATEUR, ParserUtils.getFightType(sherdog, fight));
@@ -246,7 +247,7 @@ public class ParserTest {
      * @throws ParseException
      */
     @Test
-    public void testFightResults() throws IOException, ParseException {
+    public void testFightResults() throws IOException, ParseException, SherdogParserException {
 
         //from fighters
         Fighter fighter = sherdog.getFighter("https://www.sherdog.com/fighter/Matt-Baker-49956");

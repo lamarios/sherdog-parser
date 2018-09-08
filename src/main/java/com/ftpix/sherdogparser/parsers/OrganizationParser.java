@@ -46,19 +46,20 @@ public class OrganizationParser implements SherdogParser<Organization> {
     /**
      * Parse a sherdog page
      *
-     * @param url of the sherdog page
+     * @param doc Jsoup document of the sherdog page
      * @throws IOException    if connecting to sherdog fails
      * @throws ParseException if the page structure has changed
      */
-    public Organization parse(String url) throws IOException, ParseException {
+    public Organization parseDocument(Document doc) throws IOException, ParseException {
         Organization organization = new Organization();
-        organization.setSherdogUrl(url);
+        organization.setSherdogUrl(ParserUtils.getSherdogPageUrl(doc));
 
+        String url= organization.getSherdogUrl();
         url += "/recent-events/%d";
         int page = 1;
 
 
-        Document doc = ParserUtils.parseDocument(String.format(url, page));
+        doc = ParserUtils.parseDocument(String.format(url, page));
 
         logger.info("Getting name");
         Elements name = doc.select(".bio_organization .module_header h2[itemprop=\"name\"");

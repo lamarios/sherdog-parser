@@ -40,18 +40,16 @@ public class EventParser implements SherdogParser<Event> {
 
 
     /**
-     * Parse a sherdog page
+     * parses an event from a jsoup document
      *
-     * @param url of the sherdog page
-     * @throws IOException    if connecting to sherdog fails
-     * @throws ParseException if the page structure has changed
+     * @param doc the jsoup document
+     * @return a parsed event
      */
     @Override
-    public Event parse(String url) throws IOException, ParseException {
+    public Event parseDocument(Document doc) {
         Event event = new Event();
-        event.setSherdogUrl(url);
 
-        Document doc = ParserUtils.parseDocument(url);
+        event.setSherdogUrl(ParserUtils.getSherdogPageUrl(doc));
 
         //getting name
         Elements name = doc.select(".header .section_title h1 span[itemprop=\"name\"]");

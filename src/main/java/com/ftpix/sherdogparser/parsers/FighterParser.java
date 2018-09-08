@@ -3,7 +3,6 @@ package com.ftpix.sherdogparser.parsers;
 import com.ftpix.sherdogparser.Constants;
 import com.ftpix.sherdogparser.PictureProcessor;
 import com.ftpix.sherdogparser.models.*;
-import com.sun.org.apache.bcel.internal.generic.GETFIELD;
 import org.apache.commons.codec.digest.DigestUtils;
 import org.jsoup.nodes.Document;
 import org.jsoup.nodes.Element;
@@ -14,11 +13,12 @@ import org.slf4j.LoggerFactory;
 import java.io.IOException;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
-import java.time.Instant;
 import java.time.ZoneId;
 import java.time.ZonedDateTime;
 import java.time.format.DateTimeFormatter;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Comparator;
+import java.util.List;
 import java.util.stream.Collectors;
 
 /**
@@ -64,17 +64,17 @@ public class FighterParser implements SherdogParser<Fighter> {
     /**
      * Parse a sherdog page
      *
-     * @param url of the sherdog page
+     * @param doc Jsoup document of the sherdog page
      * @throws IOException    if connecting to sherdog fails
      * @throws ParseException if the page structure has changed
      */
     @Override
-    public Fighter parse(String url) throws IOException, ParseException {
+    public Fighter parseDocument(Document doc) throws IOException {
         Fighter fighter = new Fighter();
-        fighter.setSherdogUrl(url);
+        fighter.setSherdogUrl(ParserUtils.getSherdogPageUrl(doc));
 
         logger.info("Refreshing fighter {}", fighter.getSherdogUrl());
-        Document doc = ParserUtils.parseDocument(url);
+
 
         try {
             Elements name = doc.select(".bio_fighter h1 span.fn");
