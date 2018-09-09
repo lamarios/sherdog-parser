@@ -177,6 +177,7 @@ public class ParserUtils {
      */
     public static String getSherdogPageUrl(Document doc){
         String url = doc.head().select("meta[property=\"og:url\"").attr("content");
-        return url.replace("http://", "https://"); //forcing https, for secure scrapping
+        return url.replace("http://", "https://")
+                ; //forcing https, for secure scrapping
     }
 }
