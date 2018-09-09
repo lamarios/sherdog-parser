@@ -26,6 +26,7 @@ public class EventParser implements SherdogParser<Event> {
 
     /**
      * Setting a zoneId will convert the dates to the desired zone id
+     * @param zoneId  specified zone id for time conversion
      */
     public EventParser(ZoneId zoneId) {
         this.ZONE_ID = zoneId;

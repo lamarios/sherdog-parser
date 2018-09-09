@@ -106,7 +106,7 @@ public class ParserUtils {
      *
      * @param url  the url of the image
      * @param file the file to create
-     * @throws IOException
+     * @throws IOException if the file download fails
      */
     public static void downloadImageToFile(String url, Path file) throws IOException {
 
@@ -126,6 +126,7 @@ public class ParserUtils {
     /**
      * Gets the type of a fight (Pro, amateur etc...)
      *
+     * @param parser the sherdsog parser, required as we need to use the parser to get info on the fighter
      * @param fight the fight to check
      * @return the type of the fight
      */
@@ -171,8 +172,8 @@ public class ParserUtils {
 
     /**
      * Gets the url of a page using the meta tags in head
-     * @param doc
-     * @return
+     * @param doc the jsoup document to extract the page url from
+     * @return the url of the document
      */
     public static String getSherdogPageUrl(Document doc){
         String url = doc.head().select("meta[property=\"og:url\"").attr("content");

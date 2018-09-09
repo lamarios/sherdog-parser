@@ -47,6 +47,7 @@ public class Sherdog {
      * @return an Organization
      * @throws IOException if connecting to sherdog fails
      * @throws ParseException if the page structure has changed
+     * @throws SherdogParserException if anythign related to the parser goes wrong
      */
     public Organization getOrganization(String sherdogUrl) throws IOException, ParseException, SherdogParserException {
         return new OrganizationParser(zoneId).parse(sherdogUrl);
@@ -58,6 +59,7 @@ public class Sherdog {
      * @return an Organization
      * @throws IOException if connecting to sherdog fails
      * @throws ParseException if the page structure has changed
+     * @throws SherdogParserException if anythign related to the parser goes wrong
      */
     public Organization getOrganizationFromHtml(String html) throws IOException, ParseException, SherdogParserException {
         return new OrganizationParser(zoneId).parseFromHtml(html);
@@ -70,6 +72,7 @@ public class Sherdog {
      * @return an Organization
      * @throws IOException if connecting to sherdog fails
      * @throws ParseException if the page structure has changed
+     * @throws SherdogParserException if anythign related to the parser goes wrong
      */
     public Organization getOrganization(Organizations organization) throws IOException, ParseException, SherdogParserException {
         return new OrganizationParser(zoneId).parse(organization.url);
@@ -81,6 +84,7 @@ public class Sherdog {
      * @return an Event
      * @throws IOException if connecting to sherdog fails
      * @throws ParseException if the page structure has changed
+     * @throws SherdogParserException if anythign related to the parser goes wrong
      */
     public Event getEventFromHtml(String html) throws IOException, ParseException, SherdogParserException {
         return new EventParser(zoneId).parseFromHtml(html);
@@ -92,6 +96,7 @@ public class Sherdog {
      * @return an Event
      * @throws IOException if connecting to sherdog fails
      * @throws ParseException if the page structure has changed
+     * @throws SherdogParserException if anythign related to the parser goes wrong
      */
     public Event getEvent(String sherdogUrl) throws IOException, ParseException, SherdogParserException {
         return new EventParser(zoneId).parse(sherdogUrl);
@@ -104,6 +109,7 @@ public class Sherdog {
      * @return a Fighter an all his fights
      * @throws IOException if connecting to sherdog fails
      * @throws ParseException if the page structure has changed
+     * @throws SherdogParserException if anythign related to the parser goes wrong
      */
     public Fighter getFighterFromHtml(String html) throws IOException, ParseException, SherdogParserException {
         return new FighterParser(pictureProcessor, zoneId).parseFromHtml(html);
@@ -114,6 +120,7 @@ public class Sherdog {
      * @return a Fighter an all his fights
      * @throws IOException if connecting to sherdog fails
      * @throws ParseException if the page structure has changed
+     * @throws SherdogParserException if anythign related to the parser goes wrong
      */
     public Fighter getFighter(String sherdogUrl) throws IOException, ParseException, SherdogParserException {
         return new FighterParser(pictureProcessor, zoneId).parse(sherdogUrl);
@@ -129,8 +136,8 @@ public class Sherdog {
     }
 
     /**
-     * Sets a picture processor
-     * @param pictureProcessor
+     * Sets a picture processor if some processing is needed for the fighter picture
+     * @param pictureProcessor the picture processor to use
      */
     public void setPictureProcessor(PictureProcessor pictureProcessor) {
         this.pictureProcessor = pictureProcessor;

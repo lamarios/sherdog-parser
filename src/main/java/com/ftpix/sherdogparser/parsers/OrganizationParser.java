@@ -38,6 +38,7 @@ public class OrganizationParser implements SherdogParser<Organization> {
 
     /**
      * Create a parser with a specified zoneid
+     * @param zoneId  specified zone id for time conversion
      */
     public OrganizationParser(ZoneId zoneId) {
         this.ZONE_ID = zoneId;

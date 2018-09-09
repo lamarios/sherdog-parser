@@ -35,6 +35,7 @@ public class FighterParser implements SherdogParser<Fighter> {
 
     /**
      * Create a fight parser with a specified cache folder
+     * @param processor the picture processor to use for the fighter pictures
      */
     public FighterParser(PictureProcessor processor) {
         this.PROCESSOR = processor;
@@ -43,6 +44,8 @@ public class FighterParser implements SherdogParser<Fighter> {
 
     /**
      * Generates a fight parser with specified cache folder and zone id
+     * @param processor the picture processor to use for the fighter pictures
+     * @param zoneId  specified zone id for time conversion
      */
     public FighterParser(PictureProcessor processor, ZoneId zoneId) {
         this.PROCESSOR = processor;
@@ -52,7 +55,7 @@ public class FighterParser implements SherdogParser<Fighter> {
     /**
      * FighterPArser with default cache folder location
      *
-     * @param zoneId
+     * @param zoneId  specified zone id for time conversion
      */
     public FighterParser(ZoneId zoneId) {
         this.PROCESSOR = Constants.DEFAULT_PICTURE_PROCESSOR;
@@ -66,7 +69,6 @@ public class FighterParser implements SherdogParser<Fighter> {
      *
      * @param doc Jsoup document of the sherdog page
      * @throws IOException    if connecting to sherdog fails
-     * @throws ParseException if the page structure has changed
      */
     @Override
     public Fighter parseDocument(Document doc) throws IOException {

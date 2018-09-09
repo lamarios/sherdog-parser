@@ -21,6 +21,7 @@ public interface SherdogParser<T> {
      * @return the object parsed by the parser
      * @throws IOException    if connecting to sherdog fails
      * @throws ParseException if the page structure has changed
+     * @throws SherdogParserException if anythign related to the parser goes wrong
      */
     default T parse(String url) throws IOException, ParseException, SherdogParserException {
 
@@ -38,7 +39,9 @@ public interface SherdogParser<T> {
      * Parses a document from the HTML source code directly
      *
      * @param html the HTML source code
-     * @return the parser object
+     * @return the parsed object
+     * @throws IOException    if connecting to sherdog fails
+     * @throws ParseException if the page structure has changed
      */
     default T parseFromHtml(String html) throws IOException, ParseException {
         return parseDocument(Jsoup.parse(html));
@@ -47,8 +50,10 @@ public interface SherdogParser<T> {
     /**
      * Parses a jsoup document
      *
-     * @param doc
-     * @return
+     * @param doc the document to parse
+     * @return the parsed object
+     * @throws IOException    if connecting to sherdog fails
+     * @throws ParseException if the page structure has changed
      */
     T parseDocument(Document doc) throws ParseException, IOException;
 }
