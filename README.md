@@ -17,7 +17,7 @@ Sherdog Parser is Java library to parse through Sherdog and have get all the inf
 ## Usage
 [Java Documentation](https://lamarios.github.io/sherdog-parser/apidocs/)
 
-
+### Basic
 
 First created a Sherdog object.
 ```Java
@@ -63,3 +63,11 @@ Sherdog parser = new Sherdog.Builder().withPictureProcessor((url, fighter) -> {
         }).build();
 ```
 
+### Alternative
+
+If for some reason you want to get the content of sherdog web pages on your own you can still parse the HTML document by simply using the **FromHtml** methods
+
+Example:
+```java
+Organization ufc = parser.getOrganizationFromHtml("The html code of an organisation page");
+```

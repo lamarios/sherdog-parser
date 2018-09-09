@@ -12,7 +12,6 @@ import com.ftpix.sherdogparser.parsers.OrganizationParser;
 import java.io.IOException;
 import java.text.ParseException;
 import java.time.ZoneId;
-import java.util.function.Function;
 
 /**
  * Created by gz on 20-Aug-16.
@@ -53,6 +52,17 @@ public class Sherdog {
         return new OrganizationParser(zoneId).parse(sherdogUrl);
     }
 
+    /**
+     * Gets an organization via it's sherdog page HTML, in case you want to have your own way of getting teh HTML content
+     * @param html The web page HTML
+     * @return an Organization
+     * @throws IOException if connecting to sherdog fails
+     * @throws ParseException if the page structure has changed
+     */
+    public Organization getOrganizationFromHtml(String html) throws IOException, ParseException, SherdogParserException {
+        return new OrganizationParser(zoneId).parseFromHtml(html);
+    }
+
 
     /**
      * Gets an organization via it's sherdog URL.
@@ -66,6 +76,17 @@ public class Sherdog {
     }
 
     /**
+     * Gets an event via it's shergog page HTML
+     * @param html The web page HTML
+     * @return an Event
+     * @throws IOException if connecting to sherdog fails
+     * @throws ParseException if the page structure has changed
+     */
+    public Event getEventFromHtml(String html) throws IOException, ParseException, SherdogParserException {
+        return new EventParser(zoneId).parseFromHtml(html);
+    }
+
+    /**
      * Gets an event via it's sherdog URL.
      * @param sherdogUrl Sherdog URL, can be found in the list of event of an organization
      * @return an Event
@@ -76,6 +97,17 @@ public class Sherdog {
         return new EventParser(zoneId).parse(sherdogUrl);
     }
 
+
+    /**
+     * Get a fighter via it;s sherdog page HTML
+     * @param html The web page HTML
+     * @return a Fighter an all his fights
+     * @throws IOException if connecting to sherdog fails
+     * @throws ParseException if the page structure has changed
+     */
+    public Fighter getFighterFromHtml(String html) throws IOException, ParseException, SherdogParserException {
+        return new FighterParser(pictureProcessor, zoneId).parseFromHtml(html);
+    }
     /**
      * Get a fighter via it;s sherdog URL.
      * @param sherdogUrl the shergod url of the fighter
