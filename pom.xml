@@ -103,7 +103,9 @@
 
 
     <build>
-             <plugin>
+           
+        <plugins>
+                   <plugin>
     <groupId>org.eluder.coveralls</groupId>
     <artifactId>coveralls-maven-plugin</artifactId>
     <version>4.3.0</version>
@@ -111,7 +113,6 @@
         <repoToken>yourcoverallsprojectrepositorytoken</repoToken>
     </configuration>
 </plugin>
-        <plugins>
             <!-- Jacoco -->
             <plugin>
                 <groupId>org.jacoco</groupId>
