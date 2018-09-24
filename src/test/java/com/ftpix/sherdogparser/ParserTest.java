@@ -16,6 +16,7 @@ import java.nio.file.Path;
 import java.text.ParseException;
 
 import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertTrue;
 
 /**
  * Created by gz on 20-Aug-16.
@@ -50,7 +51,7 @@ public class ParserTest {
 
         Event ufc1 = ufc.getEvents().get(0);
         assertEquals("UFC 1 - The Beginning", ufc1.getName());
-        assertEquals("https://www.sherdog.com/events/UFC-1-The-Beginning-7", ufc1.getSherdogUrl());
+        assertTrue( ufc1.getSherdogUrl().matches("https?://www.sherdog.com/events/UFC-1-The-Beginning-7"));
         assertEquals(ufc.getName(), ufc1.getOrganization().getName());
         assertEquals(ufc.getSherdogUrl(), ufc1.getOrganization().getSherdogUrl());
         assertEquals("1993-11-12T16:00+08:00[Asia/Kuala_Lumpur]", ufc1.getDate().toString());
@@ -79,7 +80,7 @@ public class ParserTest {
 
         assertEquals("UFC 1 - The Beginning", ufc1.getName());
         assertEquals("Ultimate Fighting Championship (UFC)", ufc1.getOrganization().getName());
-        assertEquals("https://www.sherdog.com/organizations/Ultimate-Fighting-Championship-UFC-2", ufc1.getOrganization().getSherdogUrl());
+        assertTrue( ufc1.getOrganization().getSherdogUrl().matches("https?://www.sherdog.com/organizations/Ultimate-Fighting-Championship-UFC-2"));
         assertEquals(8, ufc1.getFights().size());
         assertEquals("https://www.sherdog.com/events/UFC-1-The-Beginning-7", ufc1.getSherdogUrl());
         assertEquals("1993-11-12T16:00+08:00[Asia/Kuala_Lumpur]", ufc1.getDate().toString());
@@ -87,29 +88,29 @@ public class ParserTest {
         //Testing main event
         Fight fight = ufc1.getFights().get(0);
         assertEquals(FightResult.FIGHTER_1_WIN, fight.getResult());
-        assertEquals("https://www.sherdog.com/fighter/Royce-Gracie-19", fight.getFighter1().getSherdogUrl());
+        assertTrue(fight.getFighter1().getSherdogUrl().matches("https?://www.sherdog.com/fighter/Royce-Gracie-19"));
         assertEquals("Royce Gracie", fight.getFighter1().getName());
-        assertEquals("https://www.sherdog.com/fighter/Gerard-Gordeau-15", fight.getFighter2().getSherdogUrl());
+        assertTrue( fight.getFighter2().getSherdogUrl().matches("https?://www.sherdog.com/fighter/Gerard-Gordeau-15"));
         assertEquals("Gerard Gordeau", fight.getFighter2().getName());
         assertEquals("Submission (Rear-Naked Choke)", fight.getWinMethod());
         assertEquals(1, fight.getWinRound());
         assertEquals("1:44", fight.getWinTime());
         assertEquals("UFC 1 - The Beginning", fight.getEvent().getName());
-        assertEquals("https://www.sherdog.com/events/UFC-1-The-Beginning-7", fight.getEvent().getSherdogUrl());
+        assertTrue( fight.getEvent().getSherdogUrl().matches("https?://www.sherdog.com/events/UFC-1-The-Beginning-7"));
         assertEquals("1993-11-12T16:00+08:00[Asia/Kuala_Lumpur]", fight.getDate().toString());
 
         //Testing main event
         fight = ufc1.getFights().get(6);
         assertEquals(FightResult.FIGHTER_1_WIN, fight.getResult());
-        assertEquals("https://www.sherdog.com/fighter/Kevin-Rosier-17", fight.getFighter1().getSherdogUrl());
+        assertTrue( fight.getFighter1().getSherdogUrl().matches("https?://www.sherdog.com/fighter/Kevin-Rosier-17"));
         assertEquals("Kevin Rosier", fight.getFighter1().getName());
-        assertEquals("https://www.sherdog.com/fighter/Zane-Frazier-18", fight.getFighter2().getSherdogUrl());
+        assertTrue( fight.getFighter2().getSherdogUrl().matches("https?://www.sherdog.com/fighter/Zane-Frazier-18"));
         assertEquals("Zane Frazier", fight.getFighter2().getName());
         assertEquals("TKO (Punches)", fight.getWinMethod());
         assertEquals(1, fight.getWinRound());
         assertEquals("4:20", fight.getWinTime());
         assertEquals("UFC 1 - The Beginning", fight.getEvent().getName());
-        assertEquals("https://www.sherdog.com/events/UFC-1-The-Beginning-7", fight.getEvent().getSherdogUrl());
+        assertTrue( fight.getEvent().getSherdogUrl().matches("https://www.sherdog.com/events/UFC-1-The-Beginning-7"));
         assertEquals("1993-11-12T16:00+08:00[Asia/Kuala_Lumpur]", fight.getDate().toString());
 
         //Testing gson in case of stackoverflow.
