@@ -136,7 +136,8 @@ public class ParserUtils {
 
         BiFunction<SherdogBaseObject, SherdogBaseObject, FightType> getType = (f1, f2) -> {
             try {
-                return parser.getFighter(f1.getSherdogUrl())
+                Fighter fighter = parser.getFighter(f1.getSherdogUrl());
+                return fighter
                         .getFights()
                         .stream()
                         .filter(f -> f.getResult() != FightResult.NOT_HAPPENED)

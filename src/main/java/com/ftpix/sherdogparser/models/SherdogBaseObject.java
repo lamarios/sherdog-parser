@@ -17,6 +17,9 @@ public class SherdogBaseObject {
     }
 
     public void setSherdogUrl(String sherdogUrl) {
+        if(sherdogUrl.startsWith("http://www.sherdog.com")){
+            sherdogUrl = sherdogUrl.replaceFirst("http", "https");
+        }
         this.sherdogUrl = sherdogUrl;
     }
 
