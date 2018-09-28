@@ -1,10 +1,7 @@
 package com.ftpix.sherdogparser;
 
 import com.ftpix.sherdogparser.exceptions.SherdogParserException;
-import com.ftpix.sherdogparser.models.Event;
-import com.ftpix.sherdogparser.models.Fighter;
-import com.ftpix.sherdogparser.models.Organization;
-import com.ftpix.sherdogparser.models.Organizations;
+import com.ftpix.sherdogparser.models.*;
 import com.ftpix.sherdogparser.parsers.EventParser;
 import com.ftpix.sherdogparser.parsers.FighterParser;
 import com.ftpix.sherdogparser.parsers.OrganizationParser;
@@ -22,7 +19,14 @@ public class Sherdog {
     private PictureProcessor pictureProcessor = Constants.DEFAULT_PICTURE_PROCESSOR;
 
 
-
+    /**
+     * Prepares the search for fighters and events
+     * @param query the search query
+     * @return a Search object that can be augmented with things like weight class
+     */
+    public Search search(String query){
+        return new Search(query, this);
+    }
 
     /**
      * Gets the zone id

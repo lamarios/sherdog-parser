@@ -55,7 +55,7 @@ public class ParserUtils {
      * @return
      * @throws IOException
      */
-    static Document parseDocument(String url) throws IOException {
+    public static Document parseDocument(String url) throws IOException {
         return Jsoup
                 .connect(url)
                 .timeout(Constants.PARSING_TIMEOUT)

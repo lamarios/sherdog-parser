@@ -10,7 +10,7 @@ Sherdog Parser is Java library to parse through Sherdog and have get all the inf
 <dependency>
     <groupId>com.ftpix</groupId>
     <artifactId>sherdog-parser</artifactId>
-    <version>2.6</version>
+    <version>2.7</version>
 </dependency>
 ```
 
@@ -61,6 +61,32 @@ Sherdog parser = new Sherdog.Builder().withPictureProcessor((url, fighter) -> {
 
             return tempFile.toAbsolutePath().toString();
         }).build();
+```
+
+### Search
+
+You can also trigger searches using Sherdog parser to search amount fighters and events
+
+```java
+SearchResults jon = sherdog.search("jon")
+        .query();
+```
+
+You can then get the results as simplified:
+```java
+List<SherdogBaseObject> fighters = jon.getFighters();
+List<SherdogBaseObject> events = jon.getEvents();
+```
+
+Or the full data (**this can be very slow as it will fetch every data from each fighter/event page**)
+```java
+List<Fighter> hydratedFighters = jon.getFightersWithCompleteData();
+List<Event> hydratedEvents = jon.getEventsWithCompleteData();
+```
+
+You can trigger the search next result page by doing:
+```java
+SearchResults nextPage = jon.nextPage();
 ```
 
 ### Alternative
