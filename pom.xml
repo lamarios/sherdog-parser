@@ -22,7 +22,7 @@
 
     <licenses>
         <license>
-            <name> Apache License, Version 2.0</name>
+            <name>Apache License, Version 2.0</name>
             <url>https://raw.githubusercontent.com/lamarios/sherdog-parser/master/LICENSE</url>
         </license>
     </licenses>
