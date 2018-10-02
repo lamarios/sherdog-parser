@@ -9,18 +9,16 @@ import java.io.IOException;
 import java.text.ParseException;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.function.Function;
+import java.util.Objects;
 import java.util.stream.Collectors;
 
 public class SearchResults {
 
     private final String term;
     private final SearchWeightClass weightClass;
+    private final String SEARCH_URL = "http://www.sherdog.com/stats/fightfinder?SearchTxt=%s&weight=%s&page=%d";
     private Sherdog sherdog;
     private int page = 1;
-
-    private final String SEARCH_URL = "https://www.sherdog.com/stats/fightfinder?SearchTxt=%s&weight=%s&page=%d";
-
     private List<SherdogBaseObject> dryFighters = new ArrayList<>(), dryEvents = new ArrayList<>();
 
 
@@ -54,14 +52,13 @@ public class SearchResults {
 
         List<SherdogBaseObject> parse = new SearchParser().parse(url);
 
-        parse.stream()
-                .forEach(r -> {
-                    if (r.getSherdogUrl().startsWith(Constants.BASE_URL + "/events/")) {
-                        dryEvents.add(r);
-                    } else if (r.getSherdogUrl().startsWith(Constants.BASE_URL + "/fighter/")) {
-                        dryFighters.add(r);
-                    }
-                });
+        parse.forEach(r -> {
+            if (r.getSherdogUrl().startsWith(Constants.BASE_URL + "/events/")) {
+                dryEvents.add(r);
+            } else if (r.getSherdogUrl().startsWith(Constants.BASE_URL + "/fighter/")) {
+                dryFighters.add(r);
+            }
+        });
     }
 
 
@@ -69,7 +66,7 @@ public class SearchResults {
      * Gets the next result page
      *
      * @return itself
-     * @throws IOException
+     * @throws IOException if the search http query fails
      */
     public SearchResults nextPage() throws IOException {
         this.page++;
@@ -116,7 +113,7 @@ public class SearchResults {
                         return null;
                     }
                 })
-                .filter(f -> f != null)
+                .filter(Objects::nonNull)
                 .collect(Collectors.toList());
     }
 
@@ -136,7 +133,7 @@ public class SearchResults {
                         return null;
                     }
                 })
-                .filter(f -> f != null)
+                .filter(Objects::nonNull)
                 .collect(Collectors.toList());
 
     }

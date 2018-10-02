@@ -145,7 +145,7 @@ public class FighterParser implements SherdogParser<Fighter> {
         }
 
         Elements picture = doc.select(".bio_fighter .content img[itemprop=\"image\"]");
-        String pictureUrl = "https://www.sherdog.com" + picture.attr("src").trim();
+        String pictureUrl = "http://www.sherdog.com" + picture.attr("src").trim();
 
 
         Elements fightTables = doc.select(".fight_history ");
@@ -160,20 +160,18 @@ public class FighterParser implements SherdogParser<Fighter> {
 
                     return FightType.fromString(categoryName);
                 }))
-                .forEach((key, div) -> {
-                    div.stream()
-                            .map(d -> d.select(".table table tr"))
-                            .filter(tdList -> tdList.size() > 0)
-                            .findFirst()
-                            .ifPresent(tdList -> {
-                                        List<Fight> f = getFights(tdList, fighter);
+                .forEach((key, div) -> div.stream()
+                        .map(d -> d.select(".table table tr"))
+                        .filter(tdList -> tdList.size() > 0)
+                        .findFirst()
+                        .ifPresent(tdList -> {
+                                    List<Fight> f = getFights(tdList, fighter);
 
-                                        f.forEach(fight -> fight.setType(key));
+                                    f.forEach(fight -> fight.setType(key));
 
-                                        fighter.getFights().addAll(f);
-                                    }
-                            );
-                });
+                                    fighter.getFights().addAll(f);
+                                }
+                        ));
 
         List<Fight> sorted = fighter.getFights()
                 .stream()
@@ -273,7 +271,7 @@ public class FighterParser implements SherdogParser<Fighter> {
         Element link = td.select("a").get(0);
 
         SherdogBaseObject event = new SherdogBaseObject();
-        event.setName(link.html().replaceAll("<span itemprop=\"award\">|<\\/span>", ""));
+        event.setName(link.html().replaceAll("<span itemprop=\"award\">|</span>", ""));
         event.setSherdogUrl(link.attr("abs:href"));
 
 
@@ -289,9 +287,8 @@ public class FighterParser implements SherdogParser<Fighter> {
     private ZonedDateTime getDate(Element td) {
         //date
         Element date = td.select("span.sub_line").first();
-        ZonedDateTime dateFromStringToZoneId = ParserUtils.getDateFromStringToZoneId(date.html(), ZONE_ID, DateTimeFormatter.ofPattern("MMM / dd / yyyy"));
 
-        return dateFromStringToZoneId;
+        return ParserUtils.getDateFromStringToZoneId(date.html(), ZONE_ID, DateTimeFormatter.ofPattern("MMM / dd / yyyy"));
     }
 
 

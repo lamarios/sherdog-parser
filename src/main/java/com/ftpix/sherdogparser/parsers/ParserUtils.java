@@ -18,6 +18,7 @@ import java.time.ZoneId;
 import java.time.ZonedDateTime;
 import java.time.format.DateTimeFormatter;
 import java.time.format.DateTimeParseException;
+import java.util.Objects;
 import java.util.Optional;
 import java.util.function.BiFunction;
 
@@ -51,16 +52,16 @@ public class ParserUtils {
     /**
      * PArses a URL with all the required parameters
      *
-     * @param url
-     * @return
-     * @throws IOException
+     * @param url of the document to parse
+     * @return the jsoup document
+     * @throws IOException if the connection fails
      */
     public static Document parseDocument(String url) throws IOException {
         return Jsoup
                 .connect(url)
                 .timeout(Constants.PARSING_TIMEOUT)
                 .userAgent("Mozilla/5.0 (Windows; U; WindowsNT 5.1; en-US; rv1.8.1.6) Gecko/20070725 Firefox/2.0.0.6")
-                .referrer("https://www.google.com")
+                .referrer("http://www.google.com")
                 .get();
     }
 
@@ -115,7 +116,7 @@ public class ParserUtils {
             URL urlObject = new URL(url);
             URLConnection connection = urlObject.openConnection();
             connection.setRequestProperty("User-Agent", "Mozilla/5.0 (Windows; U; WindowsNT 5.1; en-US; rv1.8.1.6) Gecko/20070725 Firefox/2.0.0.6");
-            connection.setRequestProperty("Referer", "https://www.google.com");
+            connection.setRequestProperty("Referer", "http://www.google.com");
 
 
             FileUtils.copyInputStreamToFile(connection.getInputStream(), file.toFile());
@@ -127,7 +128,7 @@ public class ParserUtils {
      * Gets the type of a fight (Pro, amateur etc...)
      *
      * @param parser the sherdsog parser, required as we need to use the parser to get info on the fighter
-     * @param fight the fight to check
+     * @param fight  the fight to check
      * @return the type of the fight
      */
     public static FightType getFightType(Sherdog parser, Fight fight) {
@@ -156,9 +157,8 @@ public class ParserUtils {
             return FightType.UPCOMING;
         }
 
-        Optional<SherdogBaseObject> fighter = Optional.ofNullable(fight)
+        Optional<SherdogBaseObject> fighter = Optional.of(fight)
                 .map(Fight::getFighter1)
-                .filter(f -> f != null)
                 .filter(f -> f.getSherdogUrl() != null && f.getSherdogUrl().length() > 0);
 
         if (fighter.isPresent()) {
@@ -173,12 +173,13 @@ public class ParserUtils {
 
     /**
      * Gets the url of a page using the meta tags in head
+     *
      * @param doc the jsoup document to extract the page url from
      * @return the url of the document
      */
-    public static String getSherdogPageUrl(Document doc){
+    static String getSherdogPageUrl(Document doc) {
         String url = doc.head().select("meta[property=\"og:url\"").attr("content");
-        return url.replace("http://", "https://")
+        return url.replace("http://", "http://")
                 ; //forcing https, for secure scrapping
     }
 }

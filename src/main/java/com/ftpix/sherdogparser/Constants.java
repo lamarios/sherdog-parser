@@ -11,13 +11,7 @@ import java.util.function.Function;
 public class Constants {
     public final static String SHERDOG_TIME_ZONE = "America/New_York";
     public final static int PARSING_TIMEOUT = 60000;
-    public static final String FIGHTER_PICTURE_CACHE_FOLDER = "cache/";
     public static final PictureProcessor DEFAULT_PICTURE_PROCESSOR = (u, f) -> u;
-    public static final String BASE_URL = "https://www.sherdog.com";
+    public static final String BASE_URL = "http://www.sherdog.com";
 
-    static {
-        File f = new File(FIGHTER_PICTURE_CACHE_FOLDER);
-
-        if (f.exists()) f.mkdirs();
-    }
 }

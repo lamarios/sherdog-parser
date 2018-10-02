@@ -25,11 +25,7 @@ public interface SherdogParser<T> {
      */
     default T parse(String url) throws IOException, ParseException, SherdogParserException {
 
-        if(url.startsWith("http://www.sherdog.com")){
-           url =  url.replaceFirst("http","https");
-        }
-
-        if(!url.startsWith("https://www.sherdog.com/")){
+        if(!url.startsWith("http://www.sherdog.com/")){
             throw new NotASherdogURLException();
         }
 

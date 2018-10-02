@@ -41,7 +41,7 @@ public class ExceptionTest {
 
 
         try {
-            sherdog.getEvent("https://something.com");
+            sherdog.getEvent("http://something.com");
             Assert.fail("This should throw an exception as it is not a connection to sherdog website");
         }catch(NotASherdogURLException e){
             //yay
@@ -49,7 +49,7 @@ public class ExceptionTest {
 
 
         try {
-            sherdog.getEvent("https://www.sherrrrrr.com");
+            sherdog.getEvent("http://www.sherrrrrr.com");
             Assert.fail("This should throw an exception as it is not a sherdog.com url");
         }catch(NotASherdogURLException e){
             //yay
