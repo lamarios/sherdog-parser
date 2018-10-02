@@ -148,7 +148,7 @@ public class FighterParser implements SherdogParser<Fighter> {
         String pictureUrl = "http://www.sherdog.com" + picture.attr("src").trim();
 
 
-        Elements fightTables = doc.select(".fight_history ");
+        Elements fightTables = doc.select(".fight_history");
         logger.info("Found {} fight history tables", fightTables.size());
 
 

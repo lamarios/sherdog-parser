@@ -70,7 +70,7 @@ public class EventParser implements SherdogParser<Event> {
         Element org = doc.select(".header .section_title h2 a").get(0);
         SherdogBaseObject organization = new SherdogBaseObject();
         organization.setSherdogUrl(org.attr("abs:href"));
-        organization.setName(org.select("span[itemprop=\"name\"").get(0).html());
+        organization.setName(org.select("span[itemprop=\"name\"]").get(0).html());
 
 
         event.setOrganization(organization);

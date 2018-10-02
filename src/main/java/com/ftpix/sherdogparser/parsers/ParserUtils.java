@@ -178,8 +178,12 @@ public class ParserUtils {
      * @return the url of the document
      */
     static String getSherdogPageUrl(Document doc) {
-        String url = doc.head().select("meta[property=\"og:url\"").attr("content");
-        return url.replace("http://", "http://")
-                ; //forcing https, for secure scrapping
+        String url = Optional.ofNullable(doc.head())
+                .map(h -> h.select("meta"))
+                .map(es -> es.stream().filter(e -> e.attr("property").equalsIgnoreCase("og:url")).findFirst().orElse(null))
+                .map(m -> m.attr("content"))
+                .orElse("");
+
+        return url.replace("https://", "http://");
     }
 }

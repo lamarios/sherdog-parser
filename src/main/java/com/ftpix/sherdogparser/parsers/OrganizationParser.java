@@ -63,7 +63,7 @@ public class OrganizationParser implements SherdogParser<Organization> {
         doc = ParserUtils.parseDocument(String.format(url, page));
 
         logger.info("Getting name");
-        Elements name = doc.select(".bio_organization .module_header h2[itemprop=\"name\"");
+        Elements name = doc.select(".bio_organization .module_header h2[itemprop=\"name\"]");
         organization.setName(name.html());
 
 
@@ -150,7 +150,7 @@ public class OrganizationParser implements SherdogParser<Organization> {
     }
 
     private String getEventName(Element td) {
-        Elements nameElement = td.select("span[itemprop=\"name\"");
+        Elements nameElement = td.select("span[itemprop=\"name\"]");
 
         if (nameElement.size() > 0) {
             String name = nameElement.get(0).html();
@@ -162,7 +162,7 @@ public class OrganizationParser implements SherdogParser<Organization> {
     }
 
     private String getEventUrl(Element td) {
-        Elements url = td.select("a[itemprop=\"url\"");
+        Elements url = td.select("a[itemprop=\"url\"]");
         if (url.size() > 0) {
             String attr = url.get(0).attr("abs:href");
             return attr;
@@ -172,7 +172,7 @@ public class OrganizationParser implements SherdogParser<Organization> {
     }
 
     private ZonedDateTime getEventDate(Element element) {
-        Elements metaDate = element.select("meta[itemprop=\"startDate\"");
+        Elements metaDate = element.select("meta[itemprop=\"startDate\"]");
         if (metaDate.size() > 0) {
             String date = metaDate.get(0).attr("content");
 
