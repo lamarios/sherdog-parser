@@ -184,6 +184,10 @@ public class ParserUtils {
                 .map(m -> m.attr("content"))
                 .orElse("");
 
+        if(url.startsWith("//")){ //2018-10-10 bug in sherdog  where ig:url starts with //?
+            url = url.replaceFirst("//","http://");
+        }
+
         return url.replace("https://", "http://");
     }
 }
