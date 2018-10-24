@@ -1,5 +1,7 @@
 # Sherdog Parser
-![travis-ci](https://travis-ci.org/lamarios/sherdog-parser.svg?branch=master) ![maven](https://maven-badges.herokuapp.com/maven-central/com.ftpix/sherdog-parser/badge.svg)
+![travis-ci](https://travis-ci.org/lamarios/sherdog-parser.svg?branch=master)
+![maven](https://maven-badges.herokuapp.com/maven-central/com.ftpix/sherdog-parser/badge.svg)
+[![Coverage Status](https://coveralls.io/repos/github/lamarios/sherdog-parser/badge.svg)](https://coveralls.io/github/lamarios/sherdog-parser)
 
 Sherdog Parser is Java library to parse through Sherdog and have get all the info about MMA you need.
 
