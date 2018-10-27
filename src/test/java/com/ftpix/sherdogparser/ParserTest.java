@@ -156,7 +156,7 @@ public class ParserTest {
         assertEquals("4:05", fight.getWinTime());
         assertEquals("FEFoMP - Mayor's Cup 2011", fight.getEvent().getName());
         assertTrue(  fight.getEvent().getSherdogUrl().equalsIgnoreCase("http://www.sherdog.com/events/FEFoMP-Mayors-Cup-2011-16778"));
-        assertEquals("2011-05-07T12:00+08:00[Asia/Kuala_Lumpur]", fight.getDate().toString());
+        assertEquals("2011-05-07T00:00+08:00[Asia/Kuala_Lumpur]", fight.getDate().toString());
         //Testing fight with award span
         fight = fighter.getFights().get(0);
 
@@ -168,7 +168,7 @@ public class ParserTest {
         assertEquals("5:50", fight.getWinTime());
         assertEquals("UVF 4 - Universal Vale Tudo Fighting 4", fight.getEvent().getName());
         assertTrue( fight.getEvent().getSherdogUrl().equalsIgnoreCase("http://www.sherdog.com/events/UVF-4-Universal-Vale-Tudo-Fighting-4-394"));
-        assertEquals("1996-10-22T12:00+08:00[Asia/Kuala_Lumpur]", fight.getDate().toString());
+        assertEquals("1996-10-22T00:00+08:00[Asia/Kuala_Lumpur]", fight.getDate().toString());
         //assertTrue(fighter.getBirthday() == 0);
     }
 
