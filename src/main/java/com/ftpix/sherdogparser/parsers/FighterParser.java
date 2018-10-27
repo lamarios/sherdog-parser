@@ -19,6 +19,7 @@ import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
 import java.util.Comparator;
 import java.util.List;
+import java.util.Locale;
 import java.util.stream.Collectors;
 
 /**
@@ -59,7 +60,7 @@ public class FighterParser implements SherdogParser<Fighter> {
      */
     public FighterParser(ZoneId zoneId) {
         this.PROCESSOR = Constants.DEFAULT_PICTURE_PROCESSOR;
-        ZONE_ID = ZoneId.systemDefault();
+        ZONE_ID = zoneId;
 
     }
 
@@ -288,7 +289,7 @@ public class FighterParser implements SherdogParser<Fighter> {
         //date
         Element date = td.select("span.sub_line").first();
 
-        return ParserUtils.getDateFromStringToZoneId(date.html(), ZONE_ID, DateTimeFormatter.ofPattern("MMM / dd / yyyy"));
+        return ParserUtils.getDateFromStringToZoneId(date.html(), ZONE_ID, DateTimeFormatter.ofPattern("MMM / dd / yyyy",Locale.US));
     }
 
 

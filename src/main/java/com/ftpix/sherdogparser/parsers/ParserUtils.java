@@ -18,6 +18,7 @@ import java.time.ZoneId;
 import java.time.ZonedDateTime;
 import java.time.format.DateTimeFormatter;
 import java.time.format.DateTimeParseException;
+import java.util.Locale;
 import java.util.Objects;
 import java.util.Optional;
 import java.util.function.BiFunction;
@@ -89,7 +90,9 @@ public class ParserUtils {
      */
     static ZonedDateTime getDateFromStringToZoneId(String date, ZoneId zoneId, DateTimeFormatter formatter) throws DateTimeParseException {
         try {
-            ZonedDateTime usDate = ZonedDateTime.parse(date, formatter).withZoneSameInstant(ZoneId.of(Constants.SHERDOG_TIME_ZONE));
+            //noticed that date not parsed with non-US locale. For me this fix is helpful
+            LocalDate localDate = LocalDate.parse(date, formatter);
+            ZonedDateTime usDate = localDate.atStartOfDay(zoneId);
             return usDate.withZoneSameInstant(zoneId);
         } catch (Exception e) {
             //In case the parsing fail, we try without time
