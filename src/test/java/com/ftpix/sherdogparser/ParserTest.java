@@ -124,6 +124,7 @@ public class ParserTest {
         //trying to test on a passed away fighter to make sure the data won't change
         //RIP Kevin
         Fighter fighter = sherdog.getFighter("http://www.sherdog.com/fighter/Kevin-Randleman-162");
+        Fighter fighterSilva = sherdog.getFighter("http://www.sherdog.com/fighter/Anderson-Silva-1356");
         // Fighter condit = new FighterParser(Constants.FIGHTER_PICTURE_CACHE_FOLDER, ZoneId.of("Asia/Kuala_Lumpur")).parse("http://www.sherdog.com/fighter/Bec-Rawlings-84964");
 
 
@@ -132,6 +133,9 @@ public class ParserTest {
         assertEquals(16, fighter.getLosses());
         assertEquals(0, fighter.getDraws());
         assertEquals(0, fighter.getNc());
+        assertEquals(4, fighter.getLoseDEC());
+        assertEquals(5, fighter.getWinsKO());
+        assertEquals(1, fighterSilva.getLoseOTHER());
         assertEquals("The Monster", fighter.getNickname());
         assertEquals("5'10\"", fighter.getHeight());
         assertEquals("205 lbs", fighter.getWeight());
