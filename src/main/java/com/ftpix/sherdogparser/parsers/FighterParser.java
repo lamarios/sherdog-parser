@@ -122,10 +122,58 @@ public class FighterParser implements SherdogParser<Fighter> {
         } catch (Exception e) {
             // no info, skipping
         }
-        // wins
+        Elements methods = doc.select(".bio_graph .graph_tag");
+        try {
+            fighter.setWinsKO(Integer.parseInt(methods.get(0).html().split(" ")[0]));
+        } catch (Exception e) {
+            // no info, skipping
+        }
+
+        try {
+            fighter.setWinsSUB(Integer.parseInt(methods.get(1).html().split(" ")[0]));
+        } catch (Exception e) {
+            // no info, skipping
+        }
+
+        try {
+            fighter.setWinsDEC(Integer.parseInt(methods.get(2).html().split(" ")[0]));
+        } catch (Exception e) {
+            // no info, skipping
+        }
+
+        try {
+            fighter.setWinsOTHER(Integer.parseInt(methods.get(3).html().split(" ")[0]));
+        } catch (Exception e) {
+            // no info, skipping
+        }
+
+        // loses
         try {
             Elements losses = doc.select(".bio_graph.loser .counter");
             fighter.setLosses(Integer.parseInt(losses.get(0).html()));
+        } catch (Exception e) {
+            // no info, skipping
+        }
+        try {
+
+            fighter.setLoseKO(Integer.parseInt(methods.get(4).html().split(" ")[0]));
+        } catch (Exception e) {
+            // no info, skipping
+        }
+
+        try {
+            fighter.setLoseSUB(Integer.parseInt(methods.get(5).html().split(" ")[0]));
+        } catch (Exception e) {
+            // no info, skipping
+        }
+
+        try {
+            fighter.setLoseDEC(Integer.parseInt(methods.get(6).html().split(" ")[0]));
+        } catch (Exception e) {
+            // no info, skipping
+        }
+        try {
+            fighter.setLoseOTHER(Integer.parseInt(methods.get(7).html().split(" ")[0]));
         } catch (Exception e) {
             // no info, skipping
         }

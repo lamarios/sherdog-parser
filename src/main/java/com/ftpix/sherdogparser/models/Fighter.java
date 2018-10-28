@@ -10,7 +10,15 @@ public class Fighter extends SherdogBaseObject {
     private String weight = "";
     private Date birthday;
     private int wins = 0;
+    private int winsKO = 0;
+    private int winsSUB = 0;
+    private int winsDEC = 0;
+    private int winsOTHER = 0;
     private int losses = 0;
+    private int loseKO = 0;
+    private int loseSUB = 0;
+    private int loseDEC = 0;
+    private int loseOTHER = 0;
     private int draws = 0;
     private int nc = 0;
     private String picture = "";
@@ -122,5 +130,69 @@ public class Fighter extends SherdogBaseObject {
                 ", picture='" + picture + '\'' +
                 ", sherdogUrl='" + sherdogUrl + '\'' +
                 '}';
+    }
+
+    public int getWinsKO() {
+        return winsKO;
+    }
+
+    public void setWinsKO(int winsKO) {
+        this.winsKO = winsKO;
+    }
+
+    public int getWinsDEC() {
+        return winsDEC;
+    }
+
+    public void setWinsDEC(int winsDEC) {
+        this.winsDEC = winsDEC;
+    }
+
+    public int getWinsSUB() {
+        return winsSUB;
+    }
+
+    public void setWinsSUB(int winsSUB) {
+        this.winsSUB = winsSUB;
+    }
+
+    public int getLoseKO() {
+        return loseKO;
+    }
+
+    public void setLoseKO(int loseKO) {
+        this.loseKO = loseKO;
+    }
+
+    public int getLoseDEC() {
+        return loseDEC;
+    }
+
+    public void setLoseDEC(int loseDEC) {
+        this.loseDEC = loseDEC;
+    }
+
+    public int getLoseSUB() {
+        return loseSUB;
+    }
+
+    public void setLoseSUB(int loseSUB) {
+        this.loseSUB = loseSUB;
+    }
+
+    public int getWinsOTHER() {
+        return winsOTHER;
+    }
+
+    public void setWinsOTHER(int winsOTHER) {
+        this.winsOTHER = winsOTHER;
+    }
+
+    public int getLoseOTHER() {
+        return loseOTHER;
+    }
+
+    public void setLoseOTHER(int loseOTHER) {
+        this.loseOTHER = loseOTHER;
     }
 }
