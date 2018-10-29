@@ -10,15 +10,15 @@ public class Fighter extends SherdogBaseObject {
     private String weight = "";
     private Date birthday;
     private int wins = 0;
-    private int winsKO = 0;
-    private int winsSUB = 0;
-    private int winsDEC = 0;
-    private int winsOTHER = 0;
+    private int winsKo = 0;
+    private int winsSub = 0;
+    private int winsDec = 0;
+    private int winsOther = 0;
     private int losses = 0;
-    private int loseKO = 0;
-    private int loseSUB = 0;
-    private int loseDEC = 0;
-    private int loseOTHER = 0;
+    private int lossesKo = 0;
+    private int lossesSub = 0;
+    private int lossesDec = 0;
+    private int lossesOther = 0;
     private int draws = 0;
     private int nc = 0;
     private String picture = "";
@@ -132,67 +132,67 @@ public class Fighter extends SherdogBaseObject {
                 '}';
     }
 
-    public int getWinsKO() {
-        return winsKO;
+    public int getWinsKo() {
+        return winsKo;
     }
 
-    public void setWinsKO(int winsKO) {
-        this.winsKO = winsKO;
+    public void setWinsKo(int winsKo) {
+        this.winsKo = winsKo;
     }
 
-    public int getWinsDEC() {
-        return winsDEC;
+    public int getWinsSub() {
+        return winsSub;
     }
 
-    public void setWinsDEC(int winsDEC) {
-        this.winsDEC = winsDEC;
+    public void setWinsSub(int winsSub) {
+        this.winsSub = winsSub;
     }
 
-    public int getWinsSUB() {
-        return winsSUB;
+    public int getWinsDec() {
+        return winsDec;
     }
 
-    public void setWinsSUB(int winsSUB) {
-        this.winsSUB = winsSUB;
+    public void setWinsDec(int winsDec) {
+        this.winsDec = winsDec;
     }
 
-    public int getLoseKO() {
-        return loseKO;
+    public int getWinsOther() {
+        return winsOther;
     }
 
-    public void setLoseKO(int loseKO) {
-        this.loseKO = loseKO;
+    public void setWinsOther(int winsOther) {
+        this.winsOther = winsOther;
     }
 
-    public int getLoseDEC() {
-        return loseDEC;
+    public int getLossesKo() {
+        return lossesKo;
     }
 
-    public void setLoseDEC(int loseDEC) {
-        this.loseDEC = loseDEC;
+    public void setLossesKo(int lossesKo) {
+        this.lossesKo = lossesKo;
     }
 
-    public int getLoseSUB() {
-        return loseSUB;
+    public int getLossesSub() {
+        return lossesSub;
     }
 
-    public void setLoseSUB(int loseSUB) {
-        this.loseSUB = loseSUB;
+    public void setLossesSub(int lossesSub) {
+        this.lossesSub = lossesSub;
     }
 
-    public int getWinsOTHER() {
-        return winsOTHER;
+    public int getLossesDec() {
+        return lossesDec;
     }
 
-    public void setWinsOTHER(int winsOTHER) {
-        this.winsOTHER = winsOTHER;
+    public void setLossesDec(int lossesDec) {
+        this.lossesDec = lossesDec;
     }
 
-    public int getLoseOTHER() {
-        return loseOTHER;
+    public int getLossesOther() {
+        return lossesOther;
     }
 
-    public void setLoseOTHER(int loseOTHER) {
-        this.loseOTHER = loseOTHER;
+    public void setLossesOther(int lossesOther) {
+        this.lossesOther = lossesOther;
     }
 }

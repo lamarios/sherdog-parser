@@ -125,6 +125,8 @@ public class ParserTest {
         //RIP Kevin
         Fighter fighter = sherdog.getFighter("http://www.sherdog.com/fighter/Kevin-Randleman-162");
         Fighter fighterSilva = sherdog.getFighter("http://www.sherdog.com/fighter/Anderson-Silva-1356");
+        Fighter fighterOkami = sherdog.getFighter("http://www.sherdog.com/fighter/Yushin-Okami-5569");
+
         // Fighter condit = new FighterParser(Constants.FIGHTER_PICTURE_CACHE_FOLDER, ZoneId.of("Asia/Kuala_Lumpur")).parse("http://www.sherdog.com/fighter/Bec-Rawlings-84964");
 
 
@@ -133,9 +135,17 @@ public class ParserTest {
         assertEquals(16, fighter.getLosses());
         assertEquals(0, fighter.getDraws());
         assertEquals(0, fighter.getNc());
-        assertEquals(4, fighter.getLoseDEC());
-        assertEquals(5, fighter.getWinsKO());
-        assertEquals(1, fighterSilva.getLoseOTHER());
+
+        assertEquals(22,fighterSilva.getWinsKo());
+        assertEquals(4, fighter.getWinsSub());
+        assertEquals(8, fighter.getWinsDec());
+        assertEquals(1, fighterOkami.getWinsOther());
+        assertEquals(4, fighter.getLossesKo());
+        assertEquals(2, fighterSilva.getLossesSub());
+        assertEquals(3, fighterSilva.getLossesDec());
+        assertEquals(1, fighterSilva.getLossesOther());
+
+
         assertEquals("The Monster", fighter.getNickname());
         assertEquals("5'10\"", fighter.getHeight());
         assertEquals("205 lbs", fighter.getWeight());
