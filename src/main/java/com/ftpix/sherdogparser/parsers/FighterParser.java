@@ -33,9 +33,11 @@ public class FighterParser implements SherdogParser<Fighter> {
     private final PictureProcessor PROCESSOR;
     private final ZoneId ZONE_ID;
     private final int COLUMN_RESULT = 0, COLUMN_OPPONENT = 1, COLUMN_EVENT = 2, COLUMN_METHOD = 3, COLUMN_ROUND = 4, COLUMN_TIME = 5;
+    private final int METHOD_KO = 0, METHOD_SUBMISSION = 1, METHOD_DECISION = 2, METHOD_OTHERS = 3;
 
     /**
      * Create a fight parser with a specified cache folder
+     *
      * @param processor the picture processor to use for the fighter pictures
      */
     public FighterParser(PictureProcessor processor) {
@@ -45,8 +47,9 @@ public class FighterParser implements SherdogParser<Fighter> {
 
     /**
      * Generates a fight parser with specified cache folder and zone id
+     *
      * @param processor the picture processor to use for the fighter pictures
-     * @param zoneId  specified zone id for time conversion
+     * @param zoneId    specified zone id for time conversion
      */
     public FighterParser(PictureProcessor processor, ZoneId zoneId) {
         this.PROCESSOR = processor;
@@ -56,7 +59,7 @@ public class FighterParser implements SherdogParser<Fighter> {
     /**
      * FighterPArser with default cache folder location
      *
-     * @param zoneId  specified zone id for time conversion
+     * @param zoneId specified zone id for time conversion
      */
     public FighterParser(ZoneId zoneId) {
         this.PROCESSOR = Constants.DEFAULT_PICTURE_PROCESSOR;
@@ -69,7 +72,7 @@ public class FighterParser implements SherdogParser<Fighter> {
      * Parse a sherdog page
      *
      * @param doc Jsoup document of the sherdog page
-     * @throws IOException    if connecting to sherdog fails
+     * @throws IOException if connecting to sherdog fails
      */
     @Override
     public Fighter parseDocument(Document doc) throws IOException {
@@ -122,35 +125,30 @@ public class FighterParser implements SherdogParser<Fighter> {
         } catch (Exception e) {
             // no info, skipping
         }
-        Elements methods = doc.select(".bio_graph .graph_tag");
+        Elements winsMethods = doc.select(".bio_graph:first-of-type .graph_tag");
         try {
-            fighter.setWinsKo(Integer.parseInt(methods.get(0).html().split(" ")[0]));
+            fighter.setWinsKo(Integer.parseInt(winsMethods.get(METHOD_KO).html().split(" ")[0]));
         } catch (Exception e) {
             // no info, skipping
         }
 
         try {
-            fighter.setWinsSub(Integer.parseInt(methods.get(1).html().split(" ")[0]));
+            fighter.setWinsSub(Integer.parseInt(winsMethods.get(METHOD_SUBMISSION).html().split(" ")[0]));
         } catch (Exception e) {
             // no info, skipping
         }
 
         try {
-            fighter.setWinsDec(Integer.parseInt(methods.get(2).html().split(" ")[0]));
+            fighter.setWinsDec(Integer.parseInt(winsMethods.get(METHOD_DECISION).html().split(" ")[0]));
         } catch (Exception e) {
             // no info, skipping
         }
 
-        // methods contains 6-8 values depends on "other" loss or wins methods
 
-        int startLosser=3;
-        if(hasOtherMethod(methods)) {
-            startLosser=4;
-            try {
-                fighter.setWinsOther(Integer.parseInt(methods.get(3).html().split(" ")[0]));
-            } catch (Exception e) {
-                // no info, skipping
-            }
+        try {
+            fighter.setWinsOther(Integer.parseInt(winsMethods.get(METHOD_OTHERS).html().split(" ")[0]));
+        } catch (Exception e) {
+            // no info, skipping
         }
         // loses
         try {
@@ -160,29 +158,30 @@ public class FighterParser implements SherdogParser<Fighter> {
             // no info, skipping
         }
 
+        Elements lossesMethods = doc.select(".bio_graph.loser .graph_tag");
 
 
         try {
 
-            fighter.setLossesKo((Integer.parseInt(methods.get(startLosser).html().split(" ")[0])));
+            fighter.setLossesKo((Integer.parseInt(lossesMethods.get(METHOD_KO).html().split(" ")[0])));
         } catch (Exception e) {
             // no info, skipping
         }
 
         try {
-            fighter.setLossesSub(Integer.parseInt(methods.get(startLosser+1).html().split(" ")[0]));
+            fighter.setLossesSub(Integer.parseInt(lossesMethods.get(METHOD_SUBMISSION).html().split(" ")[0]));
         } catch (Exception e) {
             // no info, skipping
         }
 
         try {
-            fighter.setLossesDec(Integer.parseInt(methods.get(startLosser+2).html().split(" ")[0]));
+            fighter.setLossesDec(Integer.parseInt(lossesMethods.get(METHOD_DECISION).html().split(" ")[0]));
         } catch (Exception e) {
             // no info, skipping
         }
 
         try {
-            fighter.setLossesOther(Integer.parseInt(methods.get(startLosser+3).html().split(" ")[0]));
+            fighter.setLossesOther(Integer.parseInt(lossesMethods.get(METHOD_OTHERS).html().split(" ")[0]));
         } catch (Exception e) {
             // no info, skipping
         }
@@ -248,19 +247,6 @@ public class FighterParser implements SherdogParser<Fighter> {
 
         return fighter;
     }
-
-
-    /**
-     * Checking if fighter has 'other' winning method
-     * @param methods methods of wins and losses
-     */
-    private boolean hasOtherMethod(Elements methods) {
-        if (methods.get(3).html().contains("OTHER")) {
-            return true;
-        }
-        return false;
-    }
-
     /**
      * Get a fighter fights
      *
@@ -357,7 +343,7 @@ public class FighterParser implements SherdogParser<Fighter> {
         //date
         Element date = td.select("span.sub_line").first();
 
-        return ParserUtils.getDateFromStringToZoneId(date.html(), ZONE_ID, DateTimeFormatter.ofPattern("MMM / dd / yyyy",Locale.US));
+        return ParserUtils.getDateFromStringToZoneId(date.html(), ZONE_ID, DateTimeFormatter.ofPattern("MMM / dd / yyyy", Locale.US));
     }
 
 
