@@ -122,10 +122,67 @@ public class FighterParser implements SherdogParser<Fighter> {
         } catch (Exception e) {
             // no info, skipping
         }
-        // wins
+        Elements methods = doc.select(".bio_graph .graph_tag");
+        try {
+            fighter.setWinsKo(Integer.parseInt(methods.get(0).html().split(" ")[0]));
+        } catch (Exception e) {
+            // no info, skipping
+        }
+
+        try {
+            fighter.setWinsSub(Integer.parseInt(methods.get(1).html().split(" ")[0]));
+        } catch (Exception e) {
+            // no info, skipping
+        }
+
+        try {
+            fighter.setWinsDec(Integer.parseInt(methods.get(2).html().split(" ")[0]));
+        } catch (Exception e) {
+            // no info, skipping
+        }
+
+        // methods contains 6-8 values depends on "other" loss or wins methods
+
+        int startLosser=3;
+        if(hasOtherMethod(methods)) {
+            startLosser=4;
+            try {
+                fighter.setWinsOther(Integer.parseInt(methods.get(3).html().split(" ")[0]));
+            } catch (Exception e) {
+                // no info, skipping
+            }
+        }
+        // loses
         try {
             Elements losses = doc.select(".bio_graph.loser .counter");
             fighter.setLosses(Integer.parseInt(losses.get(0).html()));
+        } catch (Exception e) {
+            // no info, skipping
+        }
+
+
+
+        try {
+
+            fighter.setLossesKo((Integer.parseInt(methods.get(startLosser).html().split(" ")[0])));
+        } catch (Exception e) {
+            // no info, skipping
+        }
+
+        try {
+            fighter.setLossesSub(Integer.parseInt(methods.get(startLosser+1).html().split(" ")[0]));
+        } catch (Exception e) {
+            // no info, skipping
+        }
+
+        try {
+            fighter.setLossesDec(Integer.parseInt(methods.get(startLosser+2).html().split(" ")[0]));
+        } catch (Exception e) {
+            // no info, skipping
+        }
+
+        try {
+            fighter.setLossesOther(Integer.parseInt(methods.get(startLosser+3).html().split(" ")[0]));
         } catch (Exception e) {
             // no info, skipping
         }
@@ -192,6 +249,17 @@ public class FighterParser implements SherdogParser<Fighter> {
         return fighter;
     }
 
+
+    /**
+     * Checking if fighter has 'other' winning method
+     * @param methods methods of wins and losses
+     */
+    private boolean hasOtherMethod(Elements methods) {
+        if (methods.get(3).html().contains("OTHER")) {
+            return true;
+        }
+        return false;
+    }
 
     /**
      * Get a fighter fights
