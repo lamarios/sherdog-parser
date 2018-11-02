@@ -46,9 +46,9 @@ public class SearchTest {
         assertEquals(0, events.size());
 
         hydratedFighters = jon.getFightersWithCompleteData();
-        assertEquals(0, hydratedFighters.get(0).getWins());
-        assertEquals(1, hydratedFighters.get(0).getLosses());
-        assertEquals("Alimjon Shamagov", hydratedFighters.get(0).getName());
+        assertEquals(3, hydratedFighters.get(0).getWins());
+        assertEquals(2, hydratedFighters.get(0).getLosses());
+        assertEquals("Alimjon Shadmanov", hydratedFighters.get(0).getName());
 
 
     }
