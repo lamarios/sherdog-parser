@@ -191,6 +191,6 @@ public class ParserUtils {
             url = url.replaceFirst("//","http://");
         }
 
-        return url.replace("https://", "http://");
+        return url.replace("http://", "https://");
     }
 }

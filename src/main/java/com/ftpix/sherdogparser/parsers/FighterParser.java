@@ -202,7 +202,7 @@ public class FighterParser implements SherdogParser<Fighter> {
         }
 
         Elements picture = doc.select(".bio_fighter .content img[itemprop=\"image\"]");
-        String pictureUrl = "http://www.sherdog.com" + picture.attr("src").trim();
+        String pictureUrl = "https://www.sherdog.com" + picture.attr("src").trim();
 
 
         Elements fightTables = doc.select(".fight_history");
