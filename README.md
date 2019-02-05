@@ -9,7 +9,7 @@ Sherdog Parser is Java library to parse through Sherdog and have get all the inf
 
 Java 8
 
-**If you're using openjdk 11, there's a but with SSL certificates and you'll need to add**
+**If you're using openjdk 11, there's a [https://bugs.openjdk.java.net/browse/JDK-8213202](bug) with SSL certificates and you'll need to add**
 
 ```
 -Dhttps.protocols=TLSv1,TLSv1.1,TLSv1.2
