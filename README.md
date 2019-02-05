@@ -5,6 +5,22 @@
 
 Sherdog Parser is Java library to parse through Sherdog and have get all the info about MMA you need.
 
+## Requirement
+
+Java 8
+
+**If you're using openjdk 11, there's a but with SSL certificates and you'll need to add**
+
+```
+-Dhttps.protocols=TLSv1,TLSv1.1,TLSv1.2
+```
+
+to the arguments of your application, example:
+```
+java -Dhttps.protocols=TLSv1,TLSv1.1,TLSv1.2 -jar myjar.jar
+
+```
+
 ## Download
 
 ```xml
@@ -15,6 +31,8 @@ Sherdog Parser is Java library to parse through Sherdog and have get all the inf
     <version>2.12</version>
 </dependency>
 ```
+
+
 
 ## Usage
 [Java Documentation](https://lamarios.github.io/sherdog-parser/apidocs/)
