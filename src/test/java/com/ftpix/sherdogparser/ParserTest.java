@@ -142,7 +142,7 @@ public class ParserTest {
         assertEquals(1, fighterOkami.getWinsOther());
         assertEquals(4, fighter.getLossesKo());
         assertEquals(2, fighterSilva.getLossesSub());
-        assertEquals(3, fighterSilva.getLossesDec());
+        assertEquals(4, fighterSilva.getLossesDec());
         assertEquals(1, fighterSilva.getLossesOther());
 
 
