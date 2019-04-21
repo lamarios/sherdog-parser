@@ -136,8 +136,8 @@ public class ParserTest {
         assertEquals(0, fighter.getDraws());
         assertEquals(0, fighter.getNc());
 
-        assertEquals(22,fighterSilva.getWinsKo());
-        assertEquals(4, fighter.getWinsSub());
+        assertEquals(23,fighterSilva.getWinsKo());
+        assertEquals(0, fighter.getWinsSub());
         assertEquals(8, fighter.getWinsDec());
         assertEquals(1, fighterOkami.getWinsOther());
         assertEquals(4, fighter.getLossesKo());
@@ -177,7 +177,7 @@ public class ParserTest {
         assertEquals(FightResult.FIGHTER_1_WIN, fight.getResult());
         assertTrue( fight.getFighter2().getSherdogUrl().equalsIgnoreCase("https://www.sherdog.com/fighter/Dan-Bobish-174"));
         assertEquals("Dan Bobish", fight.getFighter2().getName());
-        assertEquals("Submission (Punches)", fight.getWinMethod());
+        assertEquals("TKO (Submission to Punches)", fight.getWinMethod());
         assertEquals(1, fight.getWinRound());
         assertEquals("5:50", fight.getWinTime());
         assertEquals("UVF 4 - Universal Vale Tudo Fighting 4", fight.getEvent().getName());
