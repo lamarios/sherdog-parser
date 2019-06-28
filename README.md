@@ -117,3 +117,5 @@ Example:
 ```java
 Organization ufc = parser.getOrganizationFromHtml("The html code of an organisation page");
 ```
+
+.
