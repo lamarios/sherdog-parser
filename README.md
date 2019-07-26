@@ -1,5 +1,5 @@
 # Sherdog Parser
-![travis-ci](https://travis-ci.org/lamarios/sherdog-parser.svg?branch=master)
+![build](https://ci.ftpix.com/app/rest/builds/buildType:SherdogParser_Build/statusIcon)
 ![maven](https://maven-badges.herokuapp.com/maven-central/com.ftpix/sherdog-parser/badge.svg)
 [![Coverage Status](https://coveralls.io/repos/github/lamarios/sherdog-parser/badge.svg)](https://coveralls.io/github/lamarios/sherdog-parser)
 
