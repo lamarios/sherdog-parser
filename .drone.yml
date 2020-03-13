@@ -1,0 +1,9 @@
+kind: pipeline
+type: kubernetes
+name: default
+
+steps:
+- name: test
+  image: maven:3.3.9
+  commands:
+  - mvn clean test jacoco:report coveralls:report
