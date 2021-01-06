@@ -6,4 +6,4 @@ steps:
 - name: test
   image: maven:3.6.3
   commands:
-  - mvn clean test jacoco:report
+  - mvn clean install
