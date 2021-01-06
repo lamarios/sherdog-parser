@@ -1,5 +1,5 @@
 # Sherdog Parser
-![build](https://ci.ftpix.com/app/rest/builds/buildType:SherdogParser_Build/statusIcon)
+[![Build Status](https://drone.ftpix.com/api/badges/lamarios/sherdog-parser/status.svg?ref=refs/heads/master)](https://drone.ftpix.com/lamarios/sherdog-parser)
 ![maven](https://maven-badges.herokuapp.com/maven-central/com.ftpix/sherdog-parser/badge.svg)
 [![Coverage Status](https://coveralls.io/repos/github/lamarios/sherdog-parser/badge.svg)](https://coveralls.io/github/lamarios/sherdog-parser)
 
