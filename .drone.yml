@@ -7,3 +7,6 @@ steps:
   image: maven:3.6.3
   commands:
   - mvn clean install
+  when:
+    branch:
+    - master
