@@ -6,7 +6,7 @@ steps:
 - name: test
   image: maven:3.6.3
   commands:
-  - mvn clean install
+  - mvn clean test jacoco:report
 
 trigger:
   branch:
