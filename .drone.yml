@@ -3,10 +3,30 @@ type: docker
 name: default
  
 steps:
+- name: restore-cache
+  image: drillster/drone-volume-cache
+  volumes:
+    - name: cache
+      path: /maven-cache
+  settings:
+    restore: true
+    mount:
+      - /root/.m2
+
 - name: test
   image: maven:3.6.3
   commands:
   - mvn clean test jacoco:report
+
+- name: rebuild-cache
+  image: drillster/drone-volume-cache
+  volumes:
+    - name: cache
+      path: /maven-cache
+  settings:
+    rebuild: true
+    mount:
+      - /root/.m2
 
 trigger:
   branch:
@@ -14,3 +34,8 @@ trigger:
   event:
   - cron
   - push
+  -
+volumes:
+  - name: cache
+    host:
+      path: /tmp/cache
