@@ -7,7 +7,7 @@ steps:
   image: drillster/drone-volume-cache
   volumes:
     - name: cache
-      path: /maven-cache
+      path: /cache
   settings:
     restore: true
     mount:
@@ -22,7 +22,7 @@ steps:
   image: drillster/drone-volume-cache
   volumes:
     - name: cache
-      path: /maven-cache
+      path: /cache
   settings:
     rebuild: true
     mount:
@@ -34,7 +34,6 @@ trigger:
   event:
   - cron
   - push
-  -
 volumes:
   - name: cache
     host:
