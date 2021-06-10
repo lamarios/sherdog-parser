@@ -1,7 +1,7 @@
 kind: pipeline
 type: docker
 name: default
- 
+
 steps:
 - name: restore-cache
   image: drillster/drone-volume-cache
@@ -14,7 +14,7 @@ steps:
       - ./m2
 
 - name: test
-  image: maven:3.6.3
+  image: maven:3.6.3-openjdk-8
   commands:
   - mvn clean test jacoco:report -Dmaven.repo.local=./m2
 
