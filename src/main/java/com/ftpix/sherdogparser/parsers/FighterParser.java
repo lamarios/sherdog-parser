@@ -247,7 +247,6 @@ public class FighterParser implements SherdogParser<Fighter> {
         doc.select("section").stream().filter(section -> !section.select(".fight_history").isEmpty()).forEach(section -> {
             Elements title = section.select(".slanted_title div:nth-child(1)");
             FightType type = FightType.fromString(title.html());
-            System.out.println(type);
 
             Elements trs = section.select(".new_table.fighter tbody tr");
             List<Fight> fights = this.getFights(trs, fighter).stream().map(f -> {
