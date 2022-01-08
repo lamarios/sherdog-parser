@@ -63,7 +63,7 @@ public class OrganizationParser implements SherdogParser<Organization> {
         doc = ParserUtils.parseDocument(String.format(url, page));
 
         logger.info("Getting name");
-        Elements name = doc.select(".bio_organization .module_header h2[itemprop=\"name\"]");
+        Elements name = doc.select("section[itemtype=\"http://schema.org/Organization\"] div[itemprop=\"name\"]");
         organization.setName(name.html());
 
 

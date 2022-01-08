@@ -7,6 +7,7 @@ import org.apache.commons.io.FileUtils;
 import org.jsoup.Jsoup;
 import org.jsoup.nodes.Document;
 import org.jsoup.nodes.Element;
+import org.jsoup.select.Elements;
 
 import java.io.IOException;
 import java.net.URL;
@@ -187,10 +188,19 @@ public class ParserUtils {
                 .map(m -> m.attr("content"))
                 .orElse("");
 
-        if(url.startsWith("//")){ //2018-10-10 bug in sherdog  where ig:url starts with //?
-            url = url.replaceFirst("//","http://");
+        if (url.startsWith("//")) { //2018-10-10 bug in sherdog  where ig:url starts with //?
+            url = url.replaceFirst("//", "http://");
         }
 
         return url.replace("http://", "https://");
+    }
+
+    static String getText(Element doc, String cssSelector) {
+        Elements e = doc.select(cssSelector);
+        return e.get(0).html();
+    }
+
+    static int getInt(Element doc, String cssSelector) {
+        return Integer.parseInt(getText(doc, cssSelector));
     }
 }

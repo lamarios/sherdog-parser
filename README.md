@@ -28,7 +28,7 @@ java -Dhttps.protocols=TLSv1,TLSv1.1,TLSv1.2 -jar myjar.jar
 <dependency>
     <groupId>com.ftpix</groupId>
     <artifactId>sherdog-parser</artifactId>
-    <version>2.12</version>
+    <version>2.14</version>
 </dependency>
 ```
 

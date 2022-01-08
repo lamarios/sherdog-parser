@@ -22,6 +22,8 @@ import java.util.List;
 import java.util.Locale;
 import java.util.stream.Collectors;
 
+import static com.ftpix.sherdogparser.parsers.ParserUtils.*;
+
 /**
  * Created by gz on 20-Aug-16.
  * Parse a fighter through a url
@@ -29,6 +31,8 @@ import java.util.stream.Collectors;
 public class FighterParser implements SherdogParser<Fighter> {
     private final Logger logger = LoggerFactory.getLogger(FighterParser.class);
     private final SimpleDateFormat df = new SimpleDateFormat("yyyy-dd-MM");
+    private final SimpleDateFormat df2 = new SimpleDateFormat("MMM dd, yyyy");
+    private final SimpleDateFormat df3 = new SimpleDateFormat("MMMM dd, yyyy");
 
     private final PictureProcessor PROCESSOR;
     private final ZoneId ZONE_ID;
@@ -77,7 +81,7 @@ public class FighterParser implements SherdogParser<Fighter> {
     @Override
     public Fighter parseDocument(Document doc) throws IOException {
         Fighter fighter = new Fighter();
-        fighter.setSherdogUrl(ParserUtils.getSherdogPageUrl(doc));
+        fighter.setSherdogUrl(getSherdogPageUrl(doc));
 
         logger.info("Refreshing fighter {}", fighter.getSherdogUrl());
 
@@ -97,143 +101,165 @@ public class FighterParser implements SherdogParser<Fighter> {
             // no info, skipping
         }
 
-        // Birthday
+        Elements bioTable = doc.select(".bio-holder table tr");
+
         try {
-            Elements birthday = doc.select("span[itemprop=\"birthDate\"]");
-            fighter.setBirthday(df.parse(birthday.get(0).html()));
+            for (Element tr : bioTable) {
+                Elements td = tr.select("td");
+                if (td.size() == 2) {
+                    switch (td.get(0).text()) {
+                        case "AGE":
+                            Elements birthday = td.get(1).select("span[itemprop=\"birthDate\"]");
+                            fighter.setBirthday(df2.parse(birthday.get(0).html()));
+                            break;
+                        case "HEIGHT":
+                            fighter.setHeight(ParserUtils.getText(td.get(1), "b:nth-child(1)"));
+                            break;
+                        case "WEIGHT":
+                            fighter.setWeight(getText(td.get(1), "b:nth-child(1)"));
+                            break;
+
+                    }
+                }
+
+            }
         } catch (Exception e) {
-            // no info, skipping
+            logger.error("Couldn't parse bio", e);
         }
-        // height
-        try {
-            Elements height = doc.select(".size_info .height strong");
-            fighter.setHeight(height.get(0).html());
-        } catch (Exception e) {
-            // no info, skipping
-        }
-        // weight
-        try {
-            Elements weight = doc.select(".size_info .weight strong");
-            fighter.setWeight(weight.get(0).html());
-        } catch (Exception e) {
-            // no info, skipping
-        }
+
         // wins
         try {
-            Elements wins = doc.select(".bio_graph .counter");
+            Elements wins = doc.select("div.win > span:nth-child(2)");
             fighter.setWins(Integer.parseInt(wins.get(0).html()));
         } catch (Exception e) {
             // no info, skipping
         }
-        Elements winsMethods = doc.select(".bio_graph:first-of-type .graph_tag");
         try {
-            fighter.setWinsKo(Integer.parseInt(winsMethods.get(METHOD_KO).html().split(" ")[0]));
+            fighter.setWinsKo(getInt(doc, ".wins > div:nth-child(3) > div:nth-child(1)"));
         } catch (Exception e) {
             // no info, skipping
         }
 
         try {
-            fighter.setWinsSub(Integer.parseInt(winsMethods.get(METHOD_SUBMISSION).html().split(" ")[0]));
+            fighter.setWinsSub(getInt(doc, ".wins > div:nth-child(5) > div:nth-child(1)"));
         } catch (Exception e) {
             // no info, skipping
         }
 
         try {
-            fighter.setWinsDec(Integer.parseInt(winsMethods.get(METHOD_DECISION).html().split(" ")[0]));
+            fighter.setWinsDec(getInt(doc, ".wins > div:nth-child(7) > div:nth-child(1)"));
         } catch (Exception e) {
             // no info, skipping
         }
 
 
         try {
-            fighter.setWinsOther(Integer.parseInt(winsMethods.get(METHOD_OTHERS).html().split(" ")[0]));
+            fighter.setWinsOther(getInt(doc, ".wins > div:nth-child(9) > div:nth-child(1)"));
         } catch (Exception e) {
             // no info, skipping
         }
         // loses
         try {
-            Elements losses = doc.select(".bio_graph.loser .counter");
-            fighter.setLosses(Integer.parseInt(losses.get(0).html()));
+            fighter.setLosses(getInt(doc, ".lose > span:nth-child(2)"));
         } catch (Exception e) {
             // no info, skipping
         }
 
-        Elements lossesMethods = doc.select(".bio_graph.loser .graph_tag");
-
 
         try {
 
-            fighter.setLossesKo((Integer.parseInt(lossesMethods.get(METHOD_KO).html().split(" ")[0])));
-        } catch (Exception e) {
-            // no info, skipping
-        }
-
-        try {
-            fighter.setLossesSub(Integer.parseInt(lossesMethods.get(METHOD_SUBMISSION).html().split(" ")[0]));
+            fighter.setLossesKo((getInt(doc, ".loses > div:nth-child(3) > div:nth-child(1)")));
         } catch (Exception e) {
             // no info, skipping
         }
 
         try {
-            fighter.setLossesDec(Integer.parseInt(lossesMethods.get(METHOD_DECISION).html().split(" ")[0]));
+            fighter.setLossesSub(getInt(doc, ".loses > div:nth-child(5) > div:nth-child(1)"));
         } catch (Exception e) {
             // no info, skipping
         }
 
         try {
-            fighter.setLossesOther(Integer.parseInt(lossesMethods.get(METHOD_OTHERS).html().split(" ")[0]));
+            fighter.setLossesDec(getInt(doc, ".loses > div:nth-child(7) > div:nth-child(1)"));
+        } catch (Exception e) {
+            // no info, skipping
+        }
+
+        try {
+            fighter.setLossesOther(getInt(doc, ".loses > div:nth-child(9) > div:nth-child(1)"));
         } catch (Exception e) {
             // no info, skipping
         }
         // draws and NC
-        Elements drawsNc = doc.select(".right_side .bio_graph .card");
-        for (Element element : drawsNc) {
-
-            switch (element.select("span.result").html()) {
-                case "Draws":
-                    fighter.setDraws(Integer.parseInt(element.select("span.counter").html()));
-                    break;
-
-                case "N/C":
-                    fighter.setNc(Integer.parseInt(element.select("span.counter").html()));
-                    break;
-            }
-
+        try {
+            fighter.setDraws(getInt(doc, "div.winloses.draws > span:nth-child(2)"));
+        } catch (Exception e) {
         }
 
-        Elements picture = doc.select(".bio_fighter .content img[itemprop=\"image\"]");
+        try {
+            fighter.setNc(getInt(doc, "div.winloses.nc > span:nth-child(2)"));
+        } catch (Exception e) {
+        }
+
+        Elements picture = doc.select("img.profile-image.photo[itemprop=\"image\"]");
         String pictureUrl = "https://www.sherdog.com" + picture.attr("src").trim();
 
+
+        fighter.setFights(new ArrayList<>());
+
+        // upcoming fight
+        try {
+            Elements fightPreview = doc.select(".fight_card_preview");
+            if (fightPreview.size() == 1) {
+                Fight fight = new Fight();
+                fight.setFighter1(fighter);
+
+                SherdogBaseObject fighter2 = new SherdogBaseObject();
+                fighter2.setName(getText(doc, "div.fighter:nth-child(3) > h3:nth-child(2) > a:nth-child(1) > span:nth-child(1)"));
+                fighter2.setSherdogUrl(doc.select("div.fighter:nth-child(3) > h3:nth-child(2) > a:nth-child(1)").get(0).attr("abs:href"));
+                fight.setFighter2(fighter2);
+
+                Elements fightCardButton = doc.select(".fight_card_preview .card_button");
+                if (!fightCardButton.isEmpty()) {
+                    Event event = new Event();
+                    event.setSherdogUrl(fightCardButton.attr("abs:href"));
+                    event.setName(getText(doc, ".fight_card_preview > h2:nth-child(1)"));
+                    event.setLocation(getText(doc, ".date_location > em:nth-child(2) > span:nth-child(2)"));
+
+                    String date = doc.select(".date_location meta").get(0).attr("content");
+                    ZonedDateTime dateFromStringToZoneId = getDateFromStringToZoneId(date, ZONE_ID);
+                    event.setDate(dateFromStringToZoneId);
+                    fight.setDate(dateFromStringToZoneId);
+
+                    fight.setEvent(event);
+
+                }
+
+                fighter.getFights().add(fight);
+            }
+        } catch (Exception e) {
+            logger.warn(e.getMessage());
+        }
 
         Elements fightTables = doc.select(".fight_history");
         logger.info("Found {} fight history tables", fightTables.size());
 
+        doc.select("section").stream().filter(section -> !section.select(".fight_history").isEmpty()).forEach(section -> {
+            Elements title = section.select(".slanted_title div:nth-child(1)");
+            FightType type = FightType.fromString(title.html());
+            System.out.println(type);
 
-        fightTables.stream()
-                //excluding upcoming fights
-                .filter(div -> !div.select(".module_header h2").html().trim().contains("Upcoming"))
-                .collect(Collectors.groupingBy(div -> {
-                    String categoryName = div.select(".module_header h2").html().trim().replaceAll("(?i)FIGHT HISTORY - ", "").trim();
+            Elements trs = section.select(".new_table.fighter tbody tr");
+            List<Fight> fights = this.getFights(trs, fighter).stream().map(f -> {
+                f.setType(type);
+                return f;
+            }).collect(Collectors.toList());
+            fighter.getFights().addAll(fights);
 
-                    return FightType.fromString(categoryName);
-                }))
-                .forEach((key, div) -> div.stream()
-                        .map(d -> d.select(".table table tr"))
-                        .filter(tdList -> tdList.size() > 0)
-                        .findFirst()
-                        .ifPresent(tdList -> {
-                                    List<Fight> f = getFights(tdList, fighter);
+        });
 
-                                    f.forEach(fight -> fight.setType(key));
 
-                                    fighter.getFights().addAll(f);
-                                }
-                        ));
-
-        List<Fight> sorted = fighter.getFights()
-                .stream()
-                .sorted(Comparator.comparing(Fight::getDate, Comparator.nullsFirst(Comparator.naturalOrder())))
-                .collect(Collectors.toList());
+        List<Fight> sorted = fighter.getFights().stream().sorted(Comparator.comparing(Fight::getDate, Comparator.nullsFirst(Comparator.naturalOrder()))).collect(Collectors.toList());
 
         fighter.setFights(sorted);
 
@@ -247,6 +273,7 @@ public class FighterParser implements SherdogParser<Fighter> {
 
         return fighter;
     }
+
     /**
      * Get a fighter fights
      *
@@ -277,7 +304,7 @@ public class FighterParser implements SherdogParser<Fighter> {
                 fight.setFighter2(getOpponent(tds.get(COLUMN_OPPONENT)));
                 fight.setEvent(getEvent(tds.get(COLUMN_EVENT)));
                 fight.setDate(getDate(tds.get(COLUMN_EVENT)));
-                fight.setWinMethod(getWinMethod(tds.get(COLUMN_METHOD)));
+                fight.setWinMethod(getWinMethod(tds.get(COLUMN_METHOD)).replaceAll("</?b>",""));
                 fight.setWinRound(getWinRound(tds.get(COLUMN_ROUND)));
                 fight.setWinTime(getWinTime(tds.get(COLUMN_TIME)));
                 fights.add(fight);
@@ -343,7 +370,7 @@ public class FighterParser implements SherdogParser<Fighter> {
         //date
         Element date = td.select("span.sub_line").first();
 
-        return ParserUtils.getDateFromStringToZoneId(date.html(), ZONE_ID, DateTimeFormatter.ofPattern("MMM / dd / yyyy", Locale.US));
+        return getDateFromStringToZoneId(date.html(), ZONE_ID, DateTimeFormatter.ofPattern("MMM / dd / yyyy", Locale.US));
     }
 
 
