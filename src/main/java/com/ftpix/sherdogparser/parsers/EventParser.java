@@ -132,14 +132,22 @@ public class EventParser implements SherdogParser<Event> {
 
         logger.info("Found {} fights", fights.size());
 
-        Elements trs = doc.select(".new_table.result tr");
-
-        fights.addAll(parseEventFights(trs, event));
-
+        // Differentiating between upcoming and old event
+        if (isUpcomingEvent(doc)) {
+            fights.addAll(parseEventFights(doc.select(".new_table.upcoming tr"), event));
+        } else {
+            fights.addAll(parseEventFights(doc.select(".new_table.result tr"), event));
+        }
 
         event.setFights(fights);
     }
 
+    /**
+     * Returns true if it is an upcoming event
+     */
+    private boolean isUpcomingEvent(final Document doc) {
+        return doc.select(".new_table.upcoming").size() > 0;
+    }
 
     /**
      * Parse fights of an old event
