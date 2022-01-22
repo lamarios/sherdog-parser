@@ -31,7 +31,7 @@ import static com.ftpix.sherdogparser.parsers.ParserUtils.*;
 public class FighterParser implements SherdogParser<Fighter> {
     private final Logger logger = LoggerFactory.getLogger(FighterParser.class);
     private final SimpleDateFormat df = new SimpleDateFormat("yyyy-dd-MM");
-    private final SimpleDateFormat df2 = new SimpleDateFormat("MMM dd, yyyy");
+    private final SimpleDateFormat df2 = new SimpleDateFormat("MMM dd, yyyy", Locale.US);
     private final SimpleDateFormat df3 = new SimpleDateFormat("MMMM dd, yyyy");
 
     private final PictureProcessor PROCESSOR;
